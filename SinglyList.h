@@ -64,15 +64,10 @@ class SinglyList{
     void removeAfterElement(int indexElement); /*remueve el elemento posterior al indicado*/
 
     /*eliminar varios elementos en...*/
-    void removeBatchFromStart(int batchRemoveCount); /*remueve n cantidad de elementos desde el inicio hasta el fin*/
+    void removeBatchFromStart(int batchRemoveCount); /*O()remueve n cantidad de elementos desde el inicio hasta el fin*/
     void removeBatchFromEnd(int batchRemoveCount); /*remueve n cantidad de elementos desde el fin hasta el inicio*/
-    void removeBatchBeforeElement(int indexElement, int batchRemoveCount); /*remueve los elementos desde antes de un elemento en específico*/
-    void removeBatchAfterElement(int indexElement, int batchRemoveCount); /*remueve los elementos desde después de un elemento en específico*/
-
-    /*actualizar elementos de manera directa...*/
-    void updateSingleElement(T existingElement, T newElement); /*actualiza un elemento, debe ser indicado el elemento a modificar y la modificacion que tendra, en ese orden*/
-    void updateBatchBeforeElement(T existingElement, const vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un elemento indexador y modifica este + los elementos antes de este*/
-    void updateBatchAfterElement(T existingElement, const vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un elemento indexador y modifica este + los elementos despues de este*/
+    void removeBatchBeforeElement(int indexElement); /*remueve todos los elementos anteriores a un elemento en específico*/
+    void removeBatchAfterElement(int indexElement); /*remueve todos los elementos posteriores aun elemento en específico*/
 
     /*actualizar elementos de manera indirecta, desde un indexador...*/
     void updateSingleElementAtIndex(int index, T newElement); /*actualiza un elemento desde el indice especificado*/
