@@ -723,21 +723,26 @@ void SinglyList<T>::removeBatchFromStart(int batchRemoveCount) {
 
 template <typename T>
 void SinglyList<T>::removeBatchFromEnd(int batchRemoveCount) {
-    /* valida si la cantidad a eliminar es invalida */
-    if (batchRemoveCount < 1 || batchRemoveCount > length) {
-        throw std::out_of_range("Cantidad inválida: " + std::to_string(batchRemoveCount));
+    /* verifica si la lista esta vacia */
+    if (this->isEmpty()) {
+        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
+    }
+
+    /* valida si el numero de elementos a eliminar es valido */
+    if (batchRemoveCount < 1 || batchRemoveCount > this->length) {
+        throw std::out_of_range("el numero de elementos a eliminar es invalido.");
     }
 
     /* encuentra el nuevo tail */
-    SinglyNode<T>* newTail = head;
-    int targetPosition = length - batchRemoveCount - 1;
+    SinglyNode<T>* newTail = this->head;
+    int targetPosition = this->length - batchRemoveCount - 1;
 
     for (int i = 0; i < targetPosition; ++i) {
         newTail = newTail->next;
     }
 
     /* liberar nodos desde newTail->next hasta tail */
-    while (newTail->next && newTail->next != tail) {
+    while (newTail->next && newTail->next != this->tail) {
         SinglyNode<T>* temp = newTail->next;
         newTail->next = temp->next;
         delete temp;
@@ -745,56 +750,62 @@ void SinglyList<T>::removeBatchFromEnd(int batchRemoveCount) {
     }
 
     /* eliminar el tail actual y actualizar el nuevo tail */
-    delete tail;
+    delete this->tail;
     if (newTail) {
         this->tail = newTail;
         this->tail->next = nullptr;
     } else {
-        head = tail = nullptr;  
+        this->head = this->tail = nullptr;  
     }
     this->length -= batchRemoveCount;
 }
 
 template <typename T>
 void SinglyList<T>::removeBatchBeforeElement(int indexElement) {
+    /* verifica si la lista esta vacia */
+    if (this->isEmpty()) {
+        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
+    }
+
     /* valida si el indice esta fuera de rango */
-    if (indexElement <= 0 || indexElement >= length) {
-        throw std::out_of_range("Índice fuera de rango: " + std::to_string(indexElement));
+    if (indexElement <= 0 || indexElement >= this->length) {
+        throw std::out_of_range("el indice esta fuera de rango: " + std::to_string(indexElement));
     }
 
     /* encuentra el nodo objetivo y su predecesor en una sola pasada */
-    SinglyNode<T>* prev = nullptr;
-    SinglyNode<T>* current = head;
-    int counter = 0;
-    
-    while (current && counter < indexElement) {
-        prev = current;
+    SinglyNode<T>* current = this->head;
+    for (int i = 0; i < indexElement; ++i) {
         current = current->next;
-        ++counter;
     }
 
     /* eliminacion masiva optimizada */
-    SinglyNode<T>* oldHead = head;
-    if (current) {
-        this->head = current;
-    } else {
-        this->head = nullptr; // Si no hay nodos restantes
-    }
-    
-    /* liberar memoria de los nodos eliminados */
+    SinglyNode<T>* oldHead = this->head;
+    this->head = current; /* nuevo head es el nodo objetivo */
+
+    /* libera la memoria de los nodos eliminados */
     while (oldHead != current) {
         SinglyNode<T>* temp = oldHead;
         oldHead = oldHead->next;
         delete temp;
-        this->length--;
+        this->length--;  /* actualiza la longitud */
+    }
+
+    /* si la lista queda vacia, actualiza tail a nullptr */
+    if (this->head == nullptr) {
+        this->tail = nullptr;
     }
 }
 
 template <typename T>
 void SinglyList<T>::removeBatchAfterElement(int indexElement) {
+    /* verifica si la lista esta vacia */
+    if (this->isEmpty()) {
+        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
+    }
+
     /* valida si el indice esta fuera de rango */
     if (indexElement < 0 || indexElement >= this->length) {
-        throw std::out_of_range("Índice fuera de rango: " + std::to_string(indexElement));
+        throw std::out_of_range("el indice esta fuera de rango: " + std::to_string(indexElement));
     }
 
     /* encuentra el nodo en la posicion indexElement */
@@ -810,7 +821,6 @@ void SinglyList<T>::removeBatchAfterElement(int indexElement) {
 
     /* eliminacion masiva optimizada */
     SinglyNode<T>* nodeToDelete = current->next;
-    SinglyNode<T>* newNext = nullptr;
 
     /* libera la memoria de los nodos eliminados */
     while (nodeToDelete != nullptr) {
@@ -829,6 +839,9 @@ void SinglyList<T>::removeBatchAfterElement(int indexElement) {
     }
 }
 
+    /*actualizar elementos de manera indirecta, desde un indexador...*/
+
+    
 template <typename T>
 bool SinglyList<T>::isEmpty() const{ return (this->length == 0); }
 
