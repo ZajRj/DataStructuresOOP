@@ -841,8 +841,467 @@ void SinglyList<T>::removeBatchAfterElement(int indexElement) {
 
     /*actualizar elementos de manera indirecta, desde un indexador...*/
 
+/*actualiza un elemento desde el indice especificado*/
+
+template <typename T>
+void SinglyList<T>::updateElement(int indexElement, T newElement) {
+    /*busca el nodo en la posicion indexElement*/
+    SinglyNode<T>* nodeToUpdate = this->findElement(indexElement);
+    /*actualiza el dato del nodo*/
+    nodeToUpdate->setData(newElement);
+}
+
+/*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos antes de este*/
+
+template <typename T>
+void SinglyList<T>::updateBatchBefore(int indexElement, const std::vector<T>& newElements) {
+    /*verifica si el vector de elementos esta vacio*/
+    if (newElements.empty()) {
+        throw std::invalid_argument("El vector de elementos no puede estar vacío.");
+    }
+
+    /*verifica si la lista esta vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("La lista está vacía.");
+    }
+
+    /*valida si el índice es válido*/
+    if (indexElement < 0 || indexElement >= this->length) {
+        throw std::out_of_range("Índice fuera de rango.");
+    }
+
+    int k = newElements.size();
+    int startIndex = indexElement - (k - 1);
+
+    /*verifica si hay suficientes elementos antes del índice*/
+    if (startIndex < 0) {
+        throw std::out_of_range("No hay suficientes elementos antes del índice.");
+    }
+
+    /*busca el nodo en la posición startIndex*/
+    SinglyNode<T>* current = this->findElement(startIndex);
+
+    /*recorre k nodos actualizando sus datos*/
+    for (int i = 0; i < k; ++i) {
+        current->setData(newElements[i]);
+        current = current->getNext();
+    }
+}
+
+/*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos despues de este*/
+
+template <typename T>
+void SinglyList<T>::updateBatchAfter(int indexElement, const std::vector<T>& newElements) {
+    /*verifica si el vector de elementos esta vacio*/
+    if (newElements.empty()) {
+        throw std::invalid_argument("El vector de elementos no puede estar vacío.");
+    }
+
+    /*verifica si la lista esta vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("La lista está vacía.");
+    }
+
+    /*valida si el índice es válido*/
+    if (indexElement < 0 || indexElement >= this->length) {
+        throw std::out_of_range("Índice fuera de rango.");
+    }
+
+    int k = newElements.size();
+    int endIndex = indexElement + k - 1;
+
+    /*verifica si hay suficientes elementos después del índice*/
+    if (endIndex >= this->length) {
+        throw std::out_of_range("No hay suficientes elementos después del índice.");
+    }
+
+    /*busca el nodo en la posición indexElement*/
+    SinglyNode<T>* current = this->findElement(indexElement);
+
+    /*recorre k nodos actualizando sus datos*/
+    for (int i = 0; i < k; ++i) {
+        current->setData(newElements[i]);
+        current = current->getNext();
+    }
+}
+
+/*busqueda*/
+
+/*devuelve el elemento una vez le entregas un index*/
+template <typename T>
+SinglyNode<T>* SinglyList<T>::findElement(int index) const {
+    /*valida si el indice esta fuera de rango*/
+    if (index < 0 || index >= this->length) {
+        throw std::out_of_range("indice fuera de rango.");
+    }
     
+    /*recorre la lista hasta llegar al indice solicitado*/
+    SinglyNode<T>* current = this->head;
+    for (int i = 0; i < index; ++i) {
+        current = current->getNext();
+    }
+    return current;
+}
+
+/*devuelve el index una vez le entregas un elemento*/
+template <typename T>
+int SinglyList<T>::findIndex(T element) const {
+    /*recorre la lista buscando la primera coincidencia*/
+    SinglyNode<T>* current = this->head;
+    int index = 0;
+    while (current != nullptr) {
+        if (current->getData() == element) {
+            return index;
+        }
+        current = current->getNext();
+        index++;
+    }
+    /*devuelve -1 si no se encuentra el elemento*/
+    return -1;
+}
+
+/*devuelve los apuntadores en formato vector a los datos requeridos*/
+template <typename T>
+std::vector<SinglyNode<T>*> SinglyList<T>::findAllElementsPointers(T element) const {
+    /*vector para almacenar los punteros coincidentes*/
+    std::vector<SinglyNode<T>*> pointers;
+    
+    /*recorre toda la lista*/
+    SinglyNode<T>* current = this->head;
+    while (current != nullptr) {
+        if (current->getData() == element) {
+            pointers.push_back(current);
+        }
+        current = current->getNext();
+    }
+    return pointers;
+}
+
+/*devuelve los indexadores en formato vector a los datos requeridos*/
+template <typename T>
+std::vector<int> SinglyList<T>::findAllElementsIndices(T element) const {
+    /*vector para almacenar los indices coincidentes*/
+    std::vector<int> indices;
+    
+    /*recorre toda la lista con un contador de indices*/
+    SinglyNode<T>* current = this->head;
+    int index = 0;
+    while (current != nullptr) {
+        if (current->getData() == element) {
+            indices.push_back(index);
+        }
+        current = current->getNext();
+        index++;
+    }
+    return indices;
+}
+
+     /*utilidades*/
+
+/*verifica si la lista está vacía*/
 template <typename T>
 bool SinglyList<T>::isEmpty() const{ return (this->length == 0); }
+
+/*limpia la lista*/
+template <typename T>
+void SinglyList<T>::clear() {
+    /*recorre la lista liberando la memoria de cada nodo*/
+    SinglyNode<T>* current = this->head;
+    while (current != nullptr) {
+        SinglyNode<T>* temp = current;
+        current = current->getNext();
+        delete temp;
+    }
+    /*actualiza head y tail a nullptr y la longitud a 0*/
+    this->head = nullptr;
+    this->tail = nullptr;
+    this->length = 0;
+}
+
+    /*copiado*/
+
+/*duplica la lista, creando una nueva instancia desde una instancia existente*/
+template <typename T>
+SinglyList<T>* SinglyList<T>::copyToList() const {
+    /*crea una nueva lista vacia*/
+    SinglyList<T>* newList = new SinglyList<T>();
+
+    /*recorre todos los nodos de la lista original*/
+    SinglyNode<T>* current = this->head;
+    while (current != nullptr) {
+        /*añade una copia del dato actual a la nueva lista*/
+        newList->addToEnd(current->getData());
+        current = current->getNext();
+    }
+
+    return newList;
+}
+
+/*duplica la lista, creando un vector desde la instancia existente*/
+template <typename T>
+std::vector<T> SinglyList<T>::copyToVector() const {
+    std::vector<T> result;
+
+    /*recorre todos los nodos de la lista*/
+    SinglyNode<T>* current = this->head;
+    while (current != nullptr) {
+        /*copia el dato al vector*/
+        result.push_back(current->getData());
+        current = current->getNext();
+    }
+
+    return result;
+}
+
+/*crea una copia compartida del elemento, es decir apuntan ambos a los mismos nodos*/
+template <typename T>
+SinglyList<T>* SinglyList<T>::shallowCopy() const {
+    /*crea una nueva lista sin copiar los nodos*/
+    SinglyList<T>* newList = new SinglyList<T>();
+
+    /*comparte los mismos nodos que la lista original*/
+    newList->head = this->head;
+    newList->tail = this->tail;
+    newList->length = this->length;
+
+    return newList;
+}
+
+    /*movilidad*/
+
+/*rueda los elementos a la derecha segun k de veces deseada*/
+template <typename T>
+void SinglyList<T>::rotateRight(int k) {
+    /*verifica si la lista esta vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("no se puede rotar, la lista esta vacia.");
+    }
+
+    /*k no puede ser negativo o mayor a length*/
+    if (k < 0) {
+        throw std::invalid_argument("k no puede ser negativo: " + std::to_string(k));
+    }
+
+    /*calcula la rotacion efectiva*/
+    int effective_k = k % this->length;
+    if (effective_k == 0) {
+        throw std::invalid_argument("no se puede rotar 0 veces o un multiplo del tamaño de la lista.");
+    }
+
+    /*encuentra el nuevo tail (posicion length - effective_k - 1)*/
+    SinglyNode<T>* new_tail = this->head;
+    for (int i = 0; i < this->length - effective_k - 1; ++i) {
+        new_tail = new_tail->getNext();
+    }
+
+    /*actualiza referencias*/
+    SinglyNode<T>* new_head = new_tail->getNext();
+    this->tail->setNext(this->head);  //conecta el final con el inicio original
+    this->head = new_head;            //nuevo head
+    this->tail = new_tail;            //nuevo tail
+    this->tail->setNext(nullptr);     //cierra la lista
+}
+
+/*rueda los elementos a la izquierda segun k de veces deseada*/
+template <typename T>
+void SinglyList<T>::rotateLeft(int k) {
+    /*verifica si la lista esta vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("no se puede rotar, la lista esta vacia.");
+    }
+
+    /*k no puede ser negativo o mayor a length*/
+    if (k < 0) {
+        throw std::invalid_argument("k no puede ser negativo: " + std::to_string(k));
+    }
+
+    /*calcula la rotacion efectiva*/
+    int effective_k = k % this->length;
+    if (effective_k == 0) {
+        throw std::invalid_argument("no se puede rotar 0 veces o un multiplo del tamaño de la lista.");
+    }
+
+    /*encuentra el nuevo tail (posicion effective_k - 1)*/
+    SinglyNode<T>* new_tail = this->head;
+    for (int i = 0; i < effective_k - 1; ++i) {
+        new_tail = new_tail->getNext();
+    }
+
+    /*actualiza referencias*/
+    SinglyNode<T>* new_head = new_tail->getNext();
+    this->tail->setNext(this->head);  //conecta el final con el inicio original
+    this->head = new_head;            //nuevo head
+    this->tail = new_tail;            //nuevo tail
+    this->tail->setNext(nullptr);     //cierra la lista
+}
+
+/*invierte el orden de elementos de la lista*/
+template <typename T>
+void SinglyList<T>::reverseList() {
+    /*verifica si la lista esta vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("no se puede invertir, la lista esta vacia.");
+    }
+
+    /*caso trivial: un solo elemento (no requiere accion)*/
+    if (this->head->getNext() == nullptr) {
+        throw std::logic_error("no se puede invertir una lista con un solo elemento.");
+    }
+
+    SinglyNode<T>* prev = nullptr;     
+    SinglyNode<T>* current = this->head; 
+    SinglyNode<T>* next = nullptr;     
+    SinglyNode<T>* originalHead = this->head; 
+
+    while (current != nullptr) {
+        next = current->getNext();    
+        current->setNext(prev);        
+        prev = current;               
+        current = next;               
+    }
+
+    this->head = prev;          
+    this->tail = originalHead;  
+}
+
+/*mueve un elemento indexado al principio*/
+template <typename T>
+void SinglyList<T>::moveToFront(int indexElement) {
+    /*verifica lista vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("la lista esta vacia.");
+    }
+
+    /*valida indice*/
+    if (indexElement < 0 || indexElement >= this->length) {
+        throw std::out_of_range("indice fuera de rango.");
+    }
+
+    /*si ya es el primer elemento*/
+    if (indexElement == 0) {
+        throw std::logic_error("el elemento ya esta en la primera posicion.");
+    }
+
+    /*busca el nodo objetivo y su anterior*/
+    SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
+    SinglyNode<T>* targetNode = prevNode->getNext();
+
+    /*desvincula el nodo de su posicion actual*/
+    prevNode->setNext(targetNode->getNext());
+
+    /*si el nodo era el tail, actualiza tail*/
+    if (targetNode == this->tail) {
+        this->tail = prevNode;
+    }
+
+    /*vincula el nodo al inicio*/
+    targetNode->setNext(this->head);
+    this->head = targetNode;
+}
+
+/*mueve un elemento especificado al final*/
+template <typename T>
+void SinglyList<T>::moveToEnd(int indexElement) {
+    /*verifica lista vacia*/
+    if (this->isEmpty()) {
+        throw std::out_of_range("la lista esta vacia.");
+    }
+
+    /*valida indice*/
+    if (indexElement < 0 || indexElement >= this->length) {
+        throw std::out_of_range("indice fuera de rango.");
+    }
+
+    /*si ya es el ultimo elemento*/
+    if (indexElement == this->length - 1) {
+        throw std::logic_error("el elemento ya esta en la ultima posicion.");
+    }
+
+    /*busca el nodo objetivo y su anterior*/
+    SinglyNode<T>* prevNode = nullptr;
+    SinglyNode<T>* targetNode = this->head;
+
+    if (indexElement != 0) {
+        prevNode = this->findElement(indexElement - 1);
+        targetNode = prevNode->getNext();
+    }
+
+    /*desvincula el nodo*/
+    if (prevNode) {
+        prevNode->setNext(targetNode->getNext());
+    } else {
+        this->head = targetNode->getNext();  //caso cuando es el primer elemento
+    }
+
+    /*vincula al final*/
+    this->tail->setNext(targetNode);
+    this->tail = targetNode;
+    targetNode->setNext(nullptr);
+}
+
+/*intercambia dos nodos en la lista*/
+template <typename T>
+void SinglyList<T>::swapNodes(int indexOne, int indexTwo) {
+    /*verifica indices validos*/
+    if (indexOne < 0 || indexOne >= this->length || 
+        indexTwo < 0 || indexTwo >= this->length) {
+        throw std::out_of_range("indices fuera de rango.");
+    }
+
+    /*no hacer nada si son iguales*/
+    if (indexOne == indexTwo) return;
+
+    /*asegura indexOne < indexTwo para simplificar logica*/
+    if (indexOne > indexTwo) {
+        std::swap(indexOne, indexTwo);
+    }
+
+    /*busca nodos y sus anteriores*/
+    SinglyNode<T>* prevNode1 = (indexOne == 0) ? nullptr : this->findElement(indexOne - 1);
+    SinglyNode<T>* node1 = (prevNode1) ? prevNode1->getNext() : this->head;
+
+    SinglyNode<T>* prevNode2 = this->findElement(indexTwo - 1);  //indexTwo > indexOne >= 0
+    SinglyNode<T>* node2 = prevNode2->getNext();
+
+    /*caso especial: nodos adyacentes*/
+    if (node1->getNext() == node2) {
+        /*actualiza enlaces de nodos anteriores*/
+        if (prevNode1) {
+            prevNode1->setNext(node2);
+        } else {
+            this->head = node2;
+        }
+
+        /*intercambia los nodos adyacentes*/
+        node1->setNext(node2->getNext());
+        node2->setNext(node1);
+
+        /*actualiza tail si es necesario*/
+        if (node2 == this->tail) {
+            this->tail = node1;
+        }
+    } else {
+        /*nodos no adyacentes: actualiza enlaces anteriores*/
+        if (prevNode1) {
+            prevNode1->setNext(node2);
+        } else {
+            this->head = node2;
+        }
+
+        prevNode2->setNext(node1);
+
+        /*intercambia los next de los nodos*/
+        SinglyNode<T>* temp = node1->getNext();
+        node1->setNext(node2->getNext());
+        node2->setNext(temp);
+
+        /*actualiza tail si node2 era el ultimo*/
+        if (node2 == this->tail) {
+            this->tail = node1;
+        } else if (node1 == this->tail) {
+            this->tail = node2;
+        }
+    }
+}
 
 #endif

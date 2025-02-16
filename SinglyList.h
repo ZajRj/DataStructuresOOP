@@ -70,9 +70,9 @@ class SinglyList{
     void removeBatchAfterElement(int indexElement); /*remueve todos los elementos posteriores aun elemento en específico*/
 
     /*actualizar elementos de manera indirecta, desde un indexador...*/
-    void updateSingleElementAtIndex(int index, T newElement); /*actualiza un elemento desde el indice especificado*/
-    void updateBatchBeforeIndex(int index, const vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos antes de este*/
-    void updateBatchAfterIndex(int index, const vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos despues de este*/
+    void updateElement(int indexElement, T newElement); /*actualiza un elemento desde el indice especificado*/
+    void updateBatchBefore(int indexElement, const std::vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos antes de este*/
+    void updateBatchAfter(int indexElement, const std::vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos despues de este*/
 
     /*busqueda*/
     SinglyNode<T>* findElement(int index) const; /*devuelve el elemento una vez le entregas un index*/
@@ -93,16 +93,13 @@ class SinglyList{
     void rotateRight(int k); /*rueda los elementos a la derecha segun k de veces deseada*/
     void rotateLeft(int k); /*rueda los elementos a la izquierda segun k de veces deseada*/
     void reverseList(); /*invierte el orden de elementos de la lista*/
-    void moveToFront(T element); /*mueve un elemento especificado al principio, esto solo funciona si no hay elementos duplicados*/
-    void moveToFront(int index); /*mueve un elemento indexado al principio, da igual si existen elementos duplicados*/
-    void moveToEnd(T element); /*mueve un elemento especificado al final, esto solo funciona si no hay elementos duplicados*/
-    void moveToEnd(T element); /*mueve un elemento especificado al final, da igual si existen elementos duplicados*/
+    void moveToFront(int indexElement); /*mueve un elemento indexado al principio, da igual si existen elementos duplicados*/
+    void moveToEnd(int indexElement); /*mueve un elemento especificado al final, da igual si existen elementos duplicados*/
     void swapNodes(int indexOne, int indexTwo); /*intercambia dos nodos en la lista*/
     void moveNodeToIndex(int currentIndex, int newIndex); /*mueve un nodo indexado a una posicion requerida*/
     pair<SinglyList<T>, SinglyList<T>> splitList(int index) const; /*divide la lista actual en dos sublistas*/
     void mergeList(const SinglyList<T> otherList); /*une una lista con otra actual*/
     void mergeSort(); /*ordena la lista. O(n * log n)*/
-
 
 };
 
