@@ -1,7 +1,6 @@
 #ifndef SINGLYLIST_H
 #define SINGLYLIST_H
 #include "SinglyNode.h"
-#include <vector>
 
 template <typename T>
 
@@ -12,8 +11,8 @@ class SinglyList{
     int length; /*numero de elementos que contiene la lista*/
 
     /*metodos privados usados dentro de otros metodos publicos*/
-    bool isNullNode(SinglyNode<T>* node) const; /*verifica que un puntero sea null o no*/
-    bool isNullNode(SinglyNode<T>* firstNode,SinglyNode<T>* secondNode) const; /*sobrecarga con dos*/
+    bool isNullNode(SinglyNode<T>* node) const; /*verifica que un puntero sea null o no, O(1)*/
+    bool isNullNode(SinglyNode<T>* firstNode,SinglyNode<T>* secondNode) const; /*sobrecarga con dos, O(1)*/
     void addUpdateLastElement(SinglyNode<T>* newTail); /*actualiza el length++ y *tail */
     void removeUpdateLastElement(SinglyNode<T>* newTail); /*actualiza el length-- y *tail */
     void addUpdateFirstElement(SinglyNode<T>* newHead); /*actualiza el length++ y el *head */

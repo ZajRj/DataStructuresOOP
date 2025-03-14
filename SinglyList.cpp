@@ -1,19 +1,20 @@
 #ifndef SINGLYLIST_H
 #define SINGLYLIST_H
 #include "SinglyNode.h"
+#include <stdexcept>
 
 /*METODOS PRIVADOS USADOS EN OTROS METODOS PUBLICOS*/
 
 template <typename T>
 bool SinglyList<T>::isNullNode(SinglyNode<T>* node) const{
 
-    return this->node == nullptr;
-}
+    return node == nullptr;
+} /*O(1)*/
 
 template <typename T>
 bool SinglyList<T>::isNullNode(SinglyNode<T>* firstNode,SinglyNode<T>* secondNode) const{
     return this->isNullNode(firstNode) || this->isNullNode(secondNode);
-}
+} /*O(1)*/
 
 /*seccion para actualizar los atributos de la lista (head, tail, length) despues de operaciones de eliminacion o de insercion en cualquier
 punto.
@@ -25,72 +26,63 @@ punto.
     *uniqueElementUpdate actualiza la head y tail, usado en caso que sea el primer elemento
 */
 
+/* precondición: debe verificarse que el puntero pasado por parametro NO sea null */
 template <typename T>
 void SinglyList<T>::addUpdateLastElement(SinglyNode<T>* newTail){
-    if(isNullNode(newTail)){
-        throw std::invalid_argument("El nuevo nodo no puede ser un puntero a null.");
-    }
     this->tail= newTail;
     this->length++;
-}
+} /*O(1)*/
 
+/* precondición: debe verificarse que el puntero pasado por parametro NO sea null */
 template <typename T>
 void SinglyList<T>::removeUpdateLastElement(SinglyNode<T>* newTail){
-    if(isNullNode(newTail)){
-        throw std::invalid_argument("El nuevo nodo no puede ser un puntero a null.");
-    }
     this->tail= newTail;
     this->length--;
-}
+} /*O(1)*/
 
+/* precondición: debe verificarse que el puntero pasado por parametro NO sea null */
 template <typename T>
 void SinglyList<T>::addUpdateFirstElement(SinglyNode<T>* newHead){
-    if(isNullNode(newHead)){
-        throw std::invalid_argument("El nuevo nodo no puede ser un puntero a null.");
-    }
     this->head= newHead;
     this->length++;
-}
+} /*O(1)*/
 
+/* precondición: debe verificarse que el puntero pasado por parametro NO sea null */
 template <typename T>
 void SinglyList<T>::removeUpdateFirstElement(SinglyNode<T>* newHead){
-    if(isNullNode(newHead)){
-        throw std::invalid_argument("El nuevo nodo no puede ser un puntero a null.");
-    }
     this->head= newHead;
     this->length--;
-}
+}/*O(1)*/
 
+/* precondición: debe verificarse que el puntero pasado por parametro NO sea null */
 template <typename T>
 void SinglyList<T>::uniqueElementUpdate(SinglyNode<T>* newHead, SinglyNode<T>* newTail){
-    if(isNullNode(newHead, newTail)){
-        throw std::invalid_argument("Los nuevos nodos no pueden ser un punteros a null.");
-    }
             this->head = newHead;
             this->tail = newTail;
-            this->length++;
-}
+            this->length = 1;
+} /*O(1)*/
 
 template <typename T>
 void SinglyList<T>::emptyElementsUpdate(){
-
     this->length=0; 
     this->head= nullptr;
     this->tail= nullptr;
-}
+} /*O(1)*/
 
-/*seccion de metodos privados del mergesort*/
+/* seccion de metodos privados del mergesort */
+
+/* precondición: head no debe ser nullptr (a menos que la lista este vacia) */
 template <typename T>
-SinglyNode<T>* SinglyList<T>::mergeSortRec(SinglyNode<T>* head) {
-    /*si la lista esta vacia o tiene un solo elemento, ya esta ordenada. */
-    if (isNullNode(head) || isNullNode(head->getNext())) {
+SinglyNode<T>* SinglyList<T>::mergeSortRec(SinglyNode<T>* head){
+    /* si la lista esta vacia o tiene un solo elemento, ya esta ordenada. */
+    if (isNullNode(head) || isNullNode(head->getNext())){
         return head;
     }
 
     /* divide la lista en dos mitades */
     SinglyNode<T>* middle = getMiddle(head);
     SinglyNode<T>* nextOfMiddle = middle->getNext();
-    middle->setNext(nullptr);/*separa ambas mitades*/
+    middle->setNext(nullptr); /* separa la lista en dos mitades: head -> middle y nextOfMiddle -> tail */
 
     /* ordena recursivamente ambas mitades */
     SinglyNode<T>* left = mergeSortRec(head);
@@ -98,35 +90,47 @@ SinglyNode<T>* SinglyList<T>::mergeSortRec(SinglyNode<T>* head) {
 
     /* une las mitades ordenadas*/
     return sortedMerge(left, right);
-}
+} /*O(n log n)*/
 
+/* precondición: head no debe ser nullptr (a menos que la lista este vacia) */
 template <typename T>
-SinglyNode<T>* SinglyList<T>::getMiddle(SinglyNode<T>* head) {
-    /*si la lista esta vacia devuelve nullptr*/
-    if (isNullNode(head)) {
+SinglyNode<T>* SinglyList<T>::getMiddle(SinglyNode<T>* head){
+    /* si la lista esta vacia devolvera nullptr */
+    if (isNullNode(head)){
         return nullptr;
     }
 
-    SinglyNode<T>* slow = head;       /*avanza de uno en uno*/
-    SinglyNode<T>* fast = head;       /*avanza de dos en dos*/
+    /* usamos dos punteros: slow avanza un nodo a la vez, fast avanza dos nodos a la vez */
+    SinglyNode<T>* slow = head;       
+    SinglyNode<T>* fast = head;       
 
-    /*cada uno avanza segun el comportamiento comentado anteriormente*/
-    while (!isNullNode(fast->getNext()) && !isNullNode(fast->getNext()->getNext())) {
+    /* avanzamos hasta que fast llegue al final de la lista */
+    while (!isNullNode(fast->getNext()) && !isNullNode(fast->getNext()->getNext())){
+        // fast->getNext() no es nullptr, por lo que fast->getNext()->getNext() es seguro
         slow = slow->getNext();
         fast = fast->getNext()->getNext();
     }
 
     /*si fast llego al final, slow esta en el medio*/
     return slow;
-}
+} /*O(n)*/
 
+/* precondición: left y right deben ser listas ordenadas */
 template <typename T>
 SinglyNode<T>* SinglyList<T>::sortedMerge(SinglyNode<T>* left, SinglyNode<T>* right) {
-    /*nodos ficticios para simplificar*/
+    /* si una de las listas es nullptr, devuelve la otra */
+    if (isNullNode(left)) {
+        return right;
+    }
+    if (isNullNode(right)) {
+        return left;
+    }
+
+    /* nodo ficticio para simplificar la fusión */
     SinglyNode<T> dummy;
     SinglyNode<T>* tail = &dummy;
 
-    /*fusiona ambas listas*/
+    /* fusiona ambas listas mientras haya elementos en ambas */
     while (!isNullNode(left) && !isNullNode(right)) {
         if (left->getData() <= right->getData()) {
             tail->setNext(left);
@@ -138,26 +142,26 @@ SinglyNode<T>* SinglyList<T>::sortedMerge(SinglyNode<T>* left, SinglyNode<T>* ri
         tail = tail->getNext();
     }
 
-    /*conecta con la lista no vacia*/
+    /* conecta con la lista no vacía */
     if (!isNullNode(left)) {
         tail->setNext(left);
     } else {
         tail->setNext(right);
     }
 
-    /*devuelve la lista fusionada excepto el nodo ficticio*/
+    /* devuelve la lista fusionada, excluyendo el nodo ficticio */
     return dummy.getNext();
-}
+} /* O(n + m) */
 
-/*METODOS PUBLICOS*/
+/* METODOS PUBLICOS */
 
-/*constructores*/
+/* constructores */
 
-/*constructor base: inicializa una lista vacia con longitud 0 y punteros head y tail nulos al no existir elementos*/
+/* constructor base: inicializa una lista vacia con longitud 0 y punteros head y tail nulos al no existir elementos */
 template <typename T>
-SinglyList<T>::SinglyList(): length(0), head(nullptr), tail(nullptr){}
+SinglyList<T>::SinglyList(): length(0), head(nullptr), tail(nullptr){} /* O(1) */
 
-/*constructor de tipo copia:*/
+/* constructor de tipo copia: */
 template <typename T>
 SinglyList<T>::SinglyList(const SinglyList<T>& other) : length{0}, head{nullptr}, tail{nullptr} {
     SinglyNode<T>* current = other.head;
@@ -165,120 +169,123 @@ SinglyList<T>::SinglyList(const SinglyList<T>& other) : length{0}, head{nullptr}
         this->addToEnd(current->getData());
         current = current->getNext();
     }
-}
+} /* O(n) */
 
-/*destructor: libera la memoria de todos los nodos de la lista */
+/* destructor: libera la memoria de todos los nodos de la lista */
 template <typename T>
 SinglyList<T>::~SinglyList(){
     this->clear();
-}
+} /* O(n) */
 
-/*getters*/
+/* getters */
 template <typename T>
-SinglyNode<T>* SinglyList<T>::getHead() const{ return (this->head); }
-
-template <typename T>
-SinglyNode<T>* SinglyList<T>::getTail() const{ return (this->tail); }
+SinglyNode<T>* SinglyList<T>::getHead() const{ return (this->head); } /* O(1) */
 
 template <typename T>
-int SinglyList<T>::getLength() const{ return (this->length); }
+SinglyNode<T>* SinglyList<T>::getTail() const{ return (this->tail); } /* O(1) */
 
-/*metodos que operan la lista*/
+template <typename T>
+int SinglyList<T>::getLength() const{ return (this->length); } /* O(1) */
 
-/*añadir un elemento en...*/
+/* metodos que operan la lista */
 
-/*agrega un nuevo elemento al principio de la lista*/
+/* añadir un elemento en... */
+
+/* agrega un nuevo elemento al principio de la lista 
+precondición: newElement debe ser un valor valido de tipo T. */
 template <typename T>
 void SinglyList<T>::addToStart(T newElement){
-    /*construye el nodo con el elemento*/
+    /* construye el nodo con el elemento nuevo a insertar */
     SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
-    /*verifica si la lista esta vacia*/
+    /* verifica si la lista esta vacia */
     if(this->isEmpty()){ 
-        /*en caso de estar vacia, anexa tail y head al nuevo nodo, al ser elemento unico*/
+        /* si esta vacia, el nuevo nodo sera tanto el head como el tail */
         this->uniqueElementUpdate(newNode,newNode);
     }else {
-        /*conecta el next del nuevo nodo a donde apuntaba anteriormente la lista con head*/
+        /* conecta al nuevo nodo en el principio de la lista */
         newNode->setNext(this->head);
-        /*este metodo actualiza el apuntador de head hacia el nuevo nodo*/
+        /* actualiza el head para que apunte al nuevo nodo */
         this->addUpdateFirstElement(newNode);
     }
-}
+} /* O(1) */
 
-/*agrega un nuevo elemento al final de la lista*/
+/* agrega un nuevo elemento al principio de la lista 
+precondición: newElement debe ser un valor valido de tipo T. */
 template <typename T>
 void SinglyList<T>::addToEnd(T newElement){
-    /*construye el nodo con el elemento*/
+    /* construye el nodo con el elemento nuevo a insertar */
     SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
-    /*verifica si la lista esta vacia*/
+    /* verifica si la lista esta vacia */
     if(this->isEmpty()){
-        /*en caso de estar vacia, anexa tail y head al nuevo nodo, al ser elemento unico*/
+        /* si esta vacia, el nuevo nodo sera tanto el head como el tail */
         this->uniqueElementUpdate(newNode,newNode);
     }else {
-        /*en caso de no estar vacia, conecta el next del apuntado de tail al nuevo nodo*/
+        /* conecta el nuevo nodo al final de la lista */
         this->tail->setNext(newNode);
-        /*este metodo actualiza el apuntador de tail hacia el nuevo nodo*/
+        /* actualiza el tail para que apunte al nuevo nodo */
         this->addUpdateLastElement(newNode);
     }
-}
+} /* O(1) */
 
-/*añade antes de algún elemento en específico*/
 template <typename T>
-void SinglyList<T>::addBeforeElement(int indexElement, T newElement){
-    /*construye el nodo con el elemento*/
+void SinglyList<T>::addBeforeElement(int indexElement, T newElement) {
+    /* construye el nodo con el nuevo elemento */
     SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
 
-    /*verifica si la lista esta vacia*/
+    /* verifica si la lista está vacía */
     if (this->isEmpty()) {
-        /*en caso de estar vacia, anexa tail y head al nuevo nodo, al ser elemento unico*/
+        /* si esta vacía, el nuevo nodo es tanto el head como el tail */
         this->uniqueElementUpdate(newNode, newNode);
     } else {
-        /*valida si el índice es válido, es decir que no sea menor a 0 ni mayor a length*/
-        if (indexElement < 0 || indexElement >= this->length) {
-            throw std::out_of_range("Índice fuera de rango.");
-        }
-
-        /*caso especial: agregar antes del primer elemento (índice 0)*/
-        if (indexElement == 0) {
+        /* si el indice es menor que 0, inserta al principio */
+        if (indexElement <= 1) {
             newNode->setNext(this->head);
             this->addUpdateFirstElement(newNode);
-        } else {
-            /*busca el nodo en la posición (indexElement - 1), el apuntador del nodo recibido por el metodo findElement
-            es ahora recibido por una variable apuntadora, por lo tanto prevNode ahora es el nodo previo al 
-            elemento que se desea indexar en su direccion de memoria*/
+        }
+        /* si el indice es mayor a la longitud, inserta al final */
+        else if (indexElement > this->length) {
+            this->tail->setNext(newNode);
+            this->addUpdateLastElement(newNode);
+        }
+        /* caso general: inserta antes del elemento en la posicion indexElement */
+        else {
             SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
-            /*el nodo nuevo se le asigna en su campo next el apuntador del nodo insertar antes*/
             newNode->setNext(prevNode->getNext());
-            /*al nodo anterior al que se desea insertar se le actualiza su campo next al nuevo nodo creado*/
             prevNode->setNext(newNode);
-            /*aumenta el length un valor*/
             this->length++;
         }
     }
-}
+} /* O(n) */
 
-/*añade despues de algún elemento en específico*/
 template <typename T>
-void SinglyList<T>::addAfterElement(int indexElement, T newElement){
+void SinglyList<T>::addAfterElement(int indexElement, T newElement) {
+    /* construye el nodo con el nuevo elemento */
     SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
 
+    /* verifica si la lista esta vacia */
     if (this->isEmpty()) {
+        /* si esta vacia, el nuevo nodo es tanto el head como el tail */
         this->uniqueElementUpdate(newNode, newNode);
     } else {
-        if (indexElement < 0 || indexElement >= this->length) {
-            throw std::out_of_range("Índice fuera de rango.");
+        /* si el indice es menor o igual a 0, inserta al principio */
+        if (indexElement <= 0) {
+            newNode->setNext(this->head);
+            this->addUpdateFirstElement(newNode);
         }
-
-        if (indexElement == this->length - 1) {
+        /* si el indice es mayor o igual a la longitud, inserta al final */
+        else if (indexElement >= this->length) {
             this->tail->setNext(newNode);
             this->addUpdateLastElement(newNode);
-        } else {
+        }
+        /* caso general: inserta despues del elemento en la posicion indexElement */
+        else {
             SinglyNode<T>* currentNode = this->findElement(indexElement);
             newNode->setNext(currentNode->getNext());
             currentNode->setNext(newNode);
             this->length++;
         }
     }
-}
+} /* O(n) */
 
 /*añadir varios elementos en...*/
 
