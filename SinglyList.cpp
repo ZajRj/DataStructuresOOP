@@ -227,466 +227,142 @@ void SinglyList<T>::addToEnd(T newElement){
     }
 } /* O(1) */
 
+/* agrega un nuevo elemento después del elemento en la posición indexElement
+precondición: newElement debe ser un valor valido de tipo T. */
 template <typename T>
-void SinglyList<T>::addBeforeElement(int indexElement, T newElement) {
-    /* construye el nodo con el nuevo elemento */
-    SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
-
-    /* verifica si la lista está vacía */
-    if (this->isEmpty()) {
-        /* si esta vacía, el nuevo nodo es tanto el head como el tail */
-        this->uniqueElementUpdate(newNode, newNode);
-    } else {
-        /* si el indice es menor que 0, inserta al principio */
-        if (indexElement <= 1) {
-            newNode->setNext(this->head);
-            this->addUpdateFirstElement(newNode);
-        }
-        /* si el indice es mayor a la longitud, inserta al final */
-        else if (indexElement > this->length) {
-            this->tail->setNext(newNode);
-            this->addUpdateLastElement(newNode);
-        }
-        /* caso general: inserta antes del elemento en la posicion indexElement */
-        else {
-            SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
-            newNode->setNext(prevNode->getNext());
-            prevNode->setNext(newNode);
-            this->length++;
-        }
-    }
-} /* O(n) */
-
-template <typename T>
-void SinglyList<T>::addAfterElement(int indexElement, T newElement) {
-    /* construye el nodo con el nuevo elemento */
-    SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
-
+void SinglyList<T>::addAtPosition(int indexElement, T newElement) {
     /* verifica si la lista esta vacia */
     if (this->isEmpty()) {
-        /* si esta vacia, el nuevo nodo es tanto el head como el tail */
+        /* si esta vacia, crea el nodo y actualiza head y tail */
+        SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
         this->uniqueElementUpdate(newNode, newNode);
     } else {
         /* si el indice es menor o igual a 0, inserta al principio */
         if (indexElement <= 0) {
-            newNode->setNext(this->head);
-            this->addUpdateFirstElement(newNode);
+            this->addToStart(newElement);
         }
         /* si el indice es mayor o igual a la longitud, inserta al final */
         else if (indexElement >= this->length) {
-            this->tail->setNext(newNode);
-            this->addUpdateLastElement(newNode);
+            this->addToEnd(newElement);
         }
-        /* caso general: inserta despues del elemento en la posicion indexElement */
+        /* caso general: inserta en la posicion deseada */
         else {
-            SinglyNode<T>* currentNode = this->findElement(indexElement);
-            newNode->setNext(currentNode->getNext());
-            currentNode->setNext(newNode);
+            /* construye el nodo con el nuevo elemento */
+            SinglyNode<T>* newNode = new SinglyNode<T>(newElement);
+
+            /* busca el nodo previo a la posicion deseada */
+            SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
+
+            /* conecta el nuevo nodo a la lista */
+            newNode->setNext(prevNode->getNext());
+            prevNode->setNext(newNode);
+
+            /* incrementa la longitud de la lista */
             this->length++;
         }
     }
 } /* O(n) */
-
-/*añadir varios elementos en...*/
-
- /*recibe un conjunto de elementos desde un array y los añade en conjunto al inicio*/
-template <typename T>
-void SinglyList<T>::addBatchToStart(const std::vector<T>& newElements){
-    /*verifica si el vector de elementos está vacío*/
-    if (newElements.empty()) {
-        /*si esta vacio, lanza una excepcion indicando que no se puede proceder*/
-        throw std::invalid_argument("el vector de elementos no puede estar vacío.");
-    }
-
-    /*inicializa un puntero para el nuevo inicio de la lista*/
-    SinglyNode<T>* newHead = nullptr;
-    /*inicializa un puntero para seguir el nodo actual mientras se crean los nuevos nodos*/
-    SinglyNode<T>* current = nullptr;
-
-    /*recorre cada elemento del vector*/
-    for (const T& element : newElements) {
-        /*crea un nuevo nodo con el elemento actual*/
-        SinglyNode<T>* newNode = new SinglyNode<T>(element);
-
-        /*si newHead es nullptr, significa que es el primer nodo*/
-        if (!newHead) {
-            /*asigna el nuevo nodo como el inicio de la lista*/
-            newHead = newNode;
-        } else {
-            /*si no es el primer nodo, enlaza el nodo actual con el nuevo nodo*/
-            current->setNext(newNode);
-        }
-
-        /*mueve el puntero current al nuevo nodo creado*/
-        current = newNode;
-    }
-
-    /*verifica si la lista original está vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, actualiza tanto el inicio como el final de la lista*/
-        this->uniqueElementUpdate(newHead, current);
-    } else {
-        /*si no esta vacia, enlaza el ultimo nodo de la nueva cadena con el inicio original*/
-        current->setNext(this->head);
-        /*actualiza el inicio de la lista*/
-        this->addUpdateFirstElement(newHead);
-    }
-
-    /*incrementa la longitud de la lista con el tamaño del vector*/
-    this->length += newElements.size();
-}
-
-/*recibe un conjunto de elementos desde un array y los añade en conjunto al final*/
-template <typename T>
-void SinglyList<T>::addBatchToEnd(const std::vector<T>& newElements){
-    /*verifica si el vector de elementos está vacío*/
-    if (newElements.empty()) {
-        /*si está vacio, lanza una excepción indicando que no se puede proceder*/
-        throw std::invalid_argument("el vector de elementos no puede estar vacío.");
-    }
-
-    /*inicializa un puntero para el inicio y el final de la nueva cadena de nodos*/
-    SinglyNode<T>* batchHead = nullptr;
-    SinglyNode<T>* batchTail = nullptr;
-
-    /*recorre cada elemento del vector*/
-    for (const T& elem : newElements) {
-        /*crea un nuevo nodo con el elemento actual*/
-        SinglyNode<T>* newNode = new SinglyNode<T>(elem);
-
-        /*si batchHead es nullptr, significa que es el primer nodo*/
-        if (!batchHead) {
-            /*asigna el nuevo nodo como el inicio de la nueva cadena*/
-            batchHead = newNode;
-            /*tambien es el final de la nueva cadena por ahora*/
-            batchTail = newNode;
-        } else {
-            /*si no es el primer nodo, enlaza el último nodo de la cadena con el nuevo nodo*/
-            batchTail->setNext(newNode);
-            /*mueve batchTail al nuevo nodo*/
-            batchTail = newNode;
-        }
-    }
-
-    /*verifica si la lista original está vacia*/
-    if (this->isEmpty()) {
-        /*si está vacia, asigna el inicio y el final de la lista a la nueva cadena */
-        this->head = batchHead;
-        this->tail = batchTail;
-    } else {
-        /* si no está vacia, enlaza el último nodo de la lista original con el inicio de la nueva cadena */
-        this->tail->setNext(batchHead);
-        /* actualiza el final de la lista al final de la nueva cadena */
-        this->tail = batchTail;
-    }
-
-    /* incrementa la longitud de la lista con el tamaño del vector */
-    this->length += newElements.size();
-}
-
-/*recibe un conjunto de elementos dónde vector[0] es apuntado por el elemento anterior del punto de inicio*/
-template <typename T>
-void SinglyList<T>::addBatchToBeforeElement(int indexElement, const std::vector<T>& newElements) {
-    /*verifica si el vector de elementos esta vacio*/
-    if (newElements.empty()) {
-        /*si esta vacio, lanza una excepcion indicando que no se puede proceder*/
-        throw std::invalid_argument("el vector de elementos no puede estar vacio.");
-    }
-
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion porque no se puede agregar antes de un elemento inexistente*/
-        throw std::out_of_range("no se puede agregar antes de un elemento, la lista esta vacia.");
-    }
-
-    /*valida si el indice es valido, es decir que no sea menor a 0 ni mayor o igual a length*/
-    if (indexElement < 0 || indexElement >= this->length) {
-        throw std::out_of_range("indice fuera de rango.");
-    }
-
-    /*caso especial: agregar antes del primer elemento (indice 0)*/
-    if (indexElement == 0) {
-        /*crea nodos para los nuevos elementos y enlazalos entre si*/
-        SinglyNode<T>* batchHead = nullptr;
-        SinglyNode<T>* batchTail = nullptr;
-        for (const T& elem : newElements) {
-            SinglyNode<T>* newNode = new SinglyNode<T>(elem);
-            if (!batchHead) {
-                batchHead = newNode;
-                batchTail = newNode;
-            } else {
-                batchTail->setNext(newNode);
-                batchTail = newNode;
-            }
-        }
-
-        /*enlaza el ultimo nodo de la nueva cadena con el head original*/
-        batchTail->setNext(this->head);
-        /*actualiza el head de la lista*/
-        this->head = batchHead;
-    } else {
-        /*busca el nodo en la posicion (indexElement - 1), que es el nodo anterior al punto de insercion*/
-        SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
-
-        /*crea nodos para los nuevos elementos y enlazalos entre si*/
-        SinglyNode<T>* batchHead = nullptr;
-        SinglyNode<T>* batchTail = nullptr;
-        for (const T& elem : newElements) {
-            SinglyNode<T>* newNode = new SinglyNode<T>(elem);
-            if (!batchHead) {
-                batchHead = newNode;
-                batchTail = newNode;
-            } else {
-                batchTail->setNext(newNode);
-                batchTail = newNode;
-            }
-        }
-
-        /*enlaza el ultimo nodo de la nueva cadena con el nodo en la posicion indexElement*/
-        batchTail->setNext(prevNode->getNext());
-        /*enlaza el nodo anterior al punto de insercion con el inicio de la nueva cadena*/
-        prevNode->setNext(batchHead);
-    }
-
-    /*incrementa la longitud de la lista con el tamaño del vector*/
-    this->length += newElements.size();
-}
-
-/*recibe un conjunto de elementos dónde vector[0] es apuntado por el elemento del punto de inicio*/
-template <typename T>
-void SinglyList<T>::removeAfterElement(int indexElement) {
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion indicando que no se puede eliminar*/
-        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
-    }
-
-    /*valida si el indice es valido, es decir que no sea menor a 0 ni mayor o igual a length*/
-    if (indexElement < 0 || indexElement >= this->length) {
-        throw std::out_of_range("indice fuera de rango.");
-    }
-
-    /*caso especial: no se puede eliminar despues del ultimo elemento*/
-    if (indexElement == this->length - 1) {
-        throw std::invalid_argument("no existe un elemento despues del ultimo nodo.");
-    }
-
-    /*busca el nodo en la posicion indexElement*/
-    SinglyNode<T>* currentNode = this->findElement(indexElement);
-
-    /*guarda el nodo que se va a eliminar (el siguiente al currentNode)*/
-    SinglyNode<T>* nodeToRemove = currentNode->getNext();
-
-    /*actualiza el next del currentNode para que apunte al nodo siguiente al que se va a eliminar*/
-    currentNode->setNext(nodeToRemove->getNext());
-
-    /*si el nodo eliminado era el tail, actualiza tail para que apunte al currentNode*/
-    if (nodeToRemove == this->tail) {
-        this->tail = currentNode;
-    }
-
-    /*libera la memoria del nodo eliminado*/
-    delete nodeToRemove;
-
-    /*reduce la longitud de la lista en 1*/
-    this->length--;
-}
 
 /*eliminar un elemento en...*/
 
 /*remueve el primer elemento de la lista*/
 template <typename T>
 void SinglyList<T>::removeFromStart() {
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion indicando que no se puede eliminar*/
-        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
+    /* verifica si la lista esta vacia */
+    if (!this->isEmpty()) {
+        /* guarda el nodo que se va a eliminar (el primer nodo) */
+        SinglyNode<T>* nodeToRemove = this->head;
+
+        /* actualiza el head para que apunte al siguiente nodo */
+        this->head = this->head->getNext();
+
+        /* si la lista queda vacia despues de la eliminacion, actualiza tail a nullptr */
+        if (this->head == nullptr) {
+            this->tail = nullptr;
+        }
+
+        /* libera la memoria del nodo eliminado */
+        delete nodeToRemove;
+
+        /* reduce la longitud de la lista - 1 */
+        this->length--;
     }
-
-    /*guarda el nodo que se va a eliminar (el primer nodo)*/
-    SinglyNode<T>* nodeToRemove = this->head;
-
-    /*actualiza el head para que apunte al siguiente nodo*/
-    this->head = this->head->getNext();
-
-    /*si la lista queda vacia despues de la eliminacion, actualiza tail a nullptr*/
-    if (this->head == nullptr) {
-        this->tail = nullptr;
-    }
-
-    /*libera la memoria del nodo eliminado*/
-    delete nodeToRemove;
-
-    /*reduce la longitud de la lista - 1*/
-    this->length--;
-}
+} /* O(1) */
 
 /*remueve el ultimo elemento de la lista*/
 template <typename T>
 void SinglyList<T>::removeFromEnd() {
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion indicando que no se puede eliminar*/
-        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
-    }
+    /* verifica si la lista esta vacia */
+    if (!this->isEmpty()) {
+        /* si la lista tiene un solo nodo */
+        if (this->head == this->tail) {
+            /* libera la memoria del unico nodo */
+            delete this->head;
+            /* actualiza head y tail a nullptr */
+            this->head = nullptr;
+            this->tail = nullptr;
+        } else {
+            /* si la lista tiene mas de un nodo, busca el nodo anterior al tail */
+            SinglyNode<T>* current = this->head;
+            while (current->getNext() != this->tail) {
+                current = current->getNext();
+            }
 
-    /*si la lista tiene un solo nodo*/
-    if (this->head == this->tail) {
-        /*libera la memoria del unico nodo*/
-        delete this->head;
-        /*actualiza head y tail a nullptr*/
-        this->head = nullptr;
-        this->tail = nullptr;
-    } else {
-        /*si la lista tiene mas de un nodo, busca el nodo anterior al tail*/
-        SinglyNode<T>* current = this->head;
-        while (current->getNext() != this->tail) {
-            current = current->getNext();
+            /* guarda el nodo que se va a eliminar (el tail actual) */
+            SinglyNode<T>* nodeToRemove = this->tail;
+
+            /* actualiza tail para que apunte al nodo anterior */
+            this->tail = current;
+
+            /* actualiza el next del nuevo tail a nullptr */
+            this->tail->setNext(nullptr);
+
+            /* libera la memoria del nodo eliminado */
+            delete nodeToRemove;
         }
 
-        /*guarda el nodo que se va a eliminar (el tail actual)*/
-        SinglyNode<T>* nodeToRemove = this->tail;
-
-        /*actualiza tail para que apunte al nodo anterior*/
-        this->tail = current;
-
-        /*actualiza el next del nuevo tail a nullptr*/
-        this->tail->setNext(nullptr);
-
-        /*libera la memoria del nodo eliminado*/
-        delete nodeToRemove;
+        /* reduce la longitud de la lista en 1 */
+        this->length--;
     }
-
-    /*reduce la longitud de la lista en 1*/
-    this->length--;
-}
+} /* O(n) */
 
 /*remueve el elemento indicado*/
 template <typename T>
 void SinglyList<T>::removeElement(int indexElement) {
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion indicando que no se puede eliminar*/
-        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
-    }
-
-    /*valida si el indice es valido, es decir que no sea menor a 0 ni mayor o igual a length*/
-    if (indexElement < 0 || indexElement >= this->length) {
-        throw std::out_of_range("indice fuera de rango.");
-    }
-
-    /*caso especial: eliminar el primer elemento (indice 0)*/
-    if (indexElement == 0) {
-        /*guarda el nodo que se va a eliminar (el head actual)*/
-        SinglyNode<T>* nodeToRemove = this->head;
-        /*actualiza head para que apunte al siguiente nodo*/
-        this->head = this->head->getNext();
-        /*si la lista queda vacia despues de la eliminacion, actualiza tail a nullptr*/
-        if (this->head == nullptr) {
-            this->tail = nullptr;
+    /* verifica si la lista esta vacia */
+    if (!this->isEmpty()) {
+        /* si el indice es menor o igual a 1, elimina el primer elemento */
+        if (indexElement <= 1) {
+            this->removeFromStart();
         }
-        /*libera la memoria del nodo eliminado*/
-        delete nodeToRemove;
-    } else {
-        /*busca el nodo en la posicion (indexElement - 1), que es el nodo anterior al que se desea eliminar*/
-        SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
-        /*guarda el nodo que se va a eliminar (el siguiente al prevNode)*/
-        SinglyNode<T>* nodeToRemove = prevNode->getNext();
-        /*actualiza el next del prevNode para que apunte al nodo siguiente al que se va a eliminar*/
-        prevNode->setNext(nodeToRemove->getNext());
-        /*si el nodo eliminado era el tail, actualiza tail para que apunte al prevNode*/
-        if (nodeToRemove == this->tail) {
-            this->tail = prevNode;
+        /* si el indice es mayor o igual a la longitud, elimina el ultimo elemento */
+        else if (indexElement >= this->length) {
+            this->removeFromEnd();
         }
-        /*libera la memoria del nodo eliminado*/
-        delete nodeToRemove;
+        /* caso general: elimina el elemento en la posicion indexElement */
+        else {
+            /* busca el nodo en la posicion (indexElement - 1), que es el nodo anterior al que se desea eliminar */
+            SinglyNode<T>* prevNode = this->findElement(indexElement - 1);
+
+            /* guarda el nodo que se va a eliminar (el siguiente al prevNode) */
+            SinglyNode<T>* nodeToRemove = prevNode->getNext();
+
+            /* actualiza el next del prevNode para que apunte al nodo siguiente al que se va a eliminar */
+            prevNode->setNext(nodeToRemove->getNext());
+
+            /* si el nodo eliminado era el tail, actualiza tail para que apunte al prevNode */
+            if (nodeToRemove == this->tail) {
+                this->tail = prevNode;
+            }
+
+            /* libera la memoria del nodo eliminado */
+            delete nodeToRemove;
+
+            /* reduce la longitud de la lista en 1 */
+            this->length--;
+        }
     }
-
-    /*reduce la longitud de la lista en 1*/
-    this->length--;
-}
-
-/*remueve el elemento anterior al indicado*/
-template <typename T>
-void SinglyList<T>::removeBeforeElement(int indexElement) {
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion indicando que no se puede eliminar*/
-        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
-    }
-
-    /*valida si el indice es valido, es decir que no sea menor a 0 ni mayor o igual a length*/
-    if (indexElement < 0 || indexElement >= this->length) {
-        throw std::out_of_range("indice fuera de rango.");
-    }
-
-    /*caso especial: no se puede eliminar antes del primer elemento (indice 0)*/
-    if (indexElement == 0) {
-        throw std::invalid_argument("no existe un elemento antes del primer nodo.");
-    }
-
-    /*si se va a eliminar antes del segundo elemento (indice 1)*/
-    if (indexElement == 1) {
-        /*guarda el nodo que se va a eliminar (el head actual)*/
-        SinglyNode<T>* nodeToRemove = this->head;
-        /*actualiza head para que apunte al siguiente nodo*/
-        this->head = this->head->getNext();
-        /*libera la memoria del nodo eliminado*/
-        delete nodeToRemove;
-    } else {
-        /*busca el nodo en la posicion (indexElement - 2), que es el nodo anterior al nodo que se desea eliminar*/
-        SinglyNode<T>* prevNode = this->findElement(indexElement - 2);
-        /*guarda el nodo que se va a eliminar (el siguiente al prevNode)*/
-        SinglyNode<T>* nodeToRemove = prevNode->getNext();
-        /*actualiza el next del prevNode para que apunte al nodo siguiente al que se va a eliminar*/
-        prevNode->setNext(nodeToRemove->getNext());
-        /*libera la memoria del nodo eliminado*/
-        delete nodeToRemove;
-    }
-
-    /*reduce la longitud de la lista en 1*/
-    this->length--;
-}
-
-/*remueve el elemento posterior al indicado*/
-template <typename T>
-void SinglyList<T>::removeAfterElement(int indexElement) {
-    /*verifica si la lista esta vacia*/
-    if (this->isEmpty()) {
-        /*si esta vacia, lanza una excepcion indicando que no se puede eliminar*/
-        throw std::out_of_range("no se puede eliminar, la lista esta vacia.");
-    }
-
-    /*valida si el indice es valido, es decir que no sea menor a 0 ni mayor o igual a length*/
-    if (indexElement < 0 || indexElement >= this->length) {
-        throw std::out_of_range("indice fuera de rango.");
-    }
-
-    /*caso especial: no se puede eliminar despues del ultimo elemento*/
-    if (indexElement == this->length - 1) {
-        throw std::invalid_argument("no existe un elemento despues del ultimo nodo.");
-    }
-
-    /*busca el nodo en la posicion indexElement*/
-    SinglyNode<T>* currentNode = this->findElement(indexElement);
-
-    /*guarda el nodo que se va a eliminar (el siguiente al currentNode)*/
-    SinglyNode<T>* nodeToRemove = currentNode->getNext();
-
-    /*actualiza el next del currentNode para que apunte al nodo siguiente al que se va a eliminar*/
-    currentNode->setNext(nodeToRemove->getNext());
-
-    /*si el nodo eliminado era el tail, actualiza tail para que apunte al currentNode*/
-    if (nodeToRemove == this->tail) {
-        this->tail = currentNode;
-    }
-
-    /*libera la memoria del nodo eliminado*/
-    delete nodeToRemove;
-
-    /*reduce la longitud de la lista en 1*/
-    this->length--;
-}
+} /*O(n) */
 
 /*eliminar varios elementos en...*/
 

@@ -46,21 +46,12 @@ class SinglyList{
     /*añadir un elemento en...*/
     void addToStart(T newElement); /*añade al principio de la lista, y actualiza a través de addUpdateFirstElement()*/
     void addToEnd(T newElement); /*añade al final de la lista, y actualiza a través de addUpdateLastElement()*/
-    void addBeforeElement(int indexElement, T newElement); /*añade antes de algún elemento en específico*/
-    void addAfterElement(int indexElement, T newElement); /*añade después de algún elemento en específico*/
-
-    /*añadir varios elementos en...*/
-    void addBatchToStart(const std::vector<T>& newElements); /*recibe un conjunto de elementos desde un array y los añade en conjunto al inicio, hace que vector[0] sea el primer elemento donde apunta list*/
-    void addBatchToEnd(const std::vector<T>& newElements); /*recibe un conjunto de elementos donde vector[n] es el ultimo elemento que apunta a nullptr*/
-    void addBatchToBeforeElement(int indexElement, const std::vector<T>& newElements); /*recibe un conjunto de elementos dónde vector[0] es apuntado por el elemento anterior del punto de inicio*/
-    void addBatchToAfterElement(int indexElement, const std::vector<T>& newElements);  /*recibe un conjunto de elementos dónde vector[0] es apuntado por el elemento del punto de inicio*/
+    void addAtPosition(int indexElement, T newElement); /*añade después de algún elemento en específico*/
 
     /*eliminar un elemento en...*/
     void removeFromStart(); /*remueve el primer elemento de la lista*/
     void removeFromEnd(); /*remueve el ultimo elemento de la lista*/
-    void removeElement(int indexElement); /*remueve el elemento indicado*/
-    void removeBeforeElement(int indexElement); /*remueve el elemento anterior al indicado*/
-    void removeAfterElement(int indexElement); /*remueve el elemento posterior al indicado*/
+    void removeElementAt(int indexElement); /*remueve el elemento indicado*/
 
     /*eliminar varios elementos en...*/
     void removeBatchFromStart(int batchRemoveCount); /*O()remueve n cantidad de elementos desde el inicio hasta el fin*/
