@@ -1,9 +1,8 @@
 #ifndef SINGLYLIST_H
 #define SINGLYLIST_H
-#include "SinglyNode.h"
+#include "../Node/SinglyNode.hpp"
 
 template <typename T>
-
 class SinglyList{
     /*atributos*/
     SinglyNode<T>* head; /*apuntador al primer elemento de la lista*/
@@ -18,7 +17,7 @@ class SinglyList{
     void addUpdateFirstElement(SinglyNode<T>* newHead); /*actualiza el length++ y el *head */
     void removeUpdateFirstElement(SinglyNode<T>* newHead); /*actualiza el length-- y el *head */
     void uniqueElementUpdate(SinglyNode<T>* newHead, SinglyNode<T>* newTail); /*actualiza una vez length y el *head *tail*/
-    void emptyElementsUpdate(); /*actualiza el length=0 y *head *tail a nullptr */
+    void emptyElementsUpdate(); /*actualiza el length=0 y *head *tail a NULL */
 
     /* metodos privados para el mergesort*/
     SinglyNode<T>* mergeSortRec(SinglyNode<T>* head);
@@ -56,19 +55,20 @@ class SinglyList{
     /*eliminar varios elementos en...*/
     void removeBatchFromStart(int batchRemoveCount); /*O()remueve n cantidad de elementos desde el inicio hasta el fin*/
     void removeBatchFromEnd(int batchRemoveCount); /*remueve n cantidad de elementos desde el fin hasta el inicio*/
-    void removeBatchBeforeElement(int indexElement); /*remueve todos los elementos anteriores a un elemento en específico*/
-    void removeBatchAfterElement(int indexElement); /*remueve todos los elementos posteriores aun elemento en específico*/
+    void removeBatchBeforeIndex(int indexElement); /*remueve todos los elementos anteriores a un elemento en específico*/
+    void removeBatchAfterIndex(int indexElement); /*remueve todos los elementos posteriores aun elemento en específico*/
 
     /*actualizar elementos de manera indirecta, desde un indexador...*/
     void updateElement(int indexElement, T newElement); /*actualiza un elemento desde el indice especificado*/
-    void updateBatchBefore(int indexElement, const std::vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos antes de este*/
-    void updateBatchAfter(int indexElement, const std::vector<T> &newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos despues de este*/
+    void updateBatchBefore(int indexElement, const SinglyList<T>& newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos antes de este*/
+    void updateBatchAfter(int indexElement, const SinglyList<T>& newElements); /*actualiza un conjunto de elementos, inicia en un indice y modifica este + los elementos despues de este*/
 
     /*busqueda*/
-    SinglyNode<T>* findElement(int index) const; /*devuelve el elemento una vez le entregas un index*/
+    SinglyNode<T>* findElementP(int index) const; /*devuelve el puntero al elemento una vez le entregas un index*/
+    T findElementAt(int index) const; /*devuelve el elemento una vez le entregas un index*/
     int findIndex(T element) const; /*devuelve el index una vez le entregas un elemento*/
-    vector<SinglyNode<T>*> findAllElementsPointers(T element) const; /*devuelve los apuntadores en formato vector a los datos requeridos*/
-    vector<int> findAllElementsIndices(T element) const; /*devuelve los indexadores en formato vector a los datos requeridos*/
+    SinglyList<SinglyNode<T>*> findAllElementsPointers(T element) const; /*devuelve los apuntadores en formato lista a los datos requeridos*/
+    SinglyList<int> findAllElementsIndices(T element) const;  /*devuelve los indexadores en formato lista a los datos requeridos*/
 
     /*utilidades*/
     bool isEmpty() const; /*verifica si la lista esta vacia*/
@@ -76,7 +76,6 @@ class SinglyList{
 
     /*copiado*/
     SinglyList<T>* copyToList() const; /*duplica la lista, creando una nueva instancia desde una instancia existente*/
-    vector<T> copyToVector() const; /*duplica la lista, creando un vector desde la instancia existente*/
     SinglyList<T>* shallowCopy() const; /*crea una copia compartida del elemento, es decir apuntan ambos a los mismos nodos*/
     
     /*movilidad*/
@@ -86,11 +85,9 @@ class SinglyList{
     void moveToFront(int indexElement); /*mueve un elemento indexado al principio, da igual si existen elementos duplicados*/
     void moveToEnd(int indexElement); /*mueve un elemento especificado al final, da igual si existen elementos duplicados*/
     void swapNodes(int indexOne, int indexTwo); /*intercambia dos nodos en la lista*/
-    void moveNodeToIndex(int currentIndex, int newIndex); /*mueve un nodo indexado a una posicion requerida*/
-    pair<SinglyList<T>, SinglyList<T>> splitList(int index) const; /*divide la lista actual en dos sublistas*/
-    void mergeList(const SinglyList<T> otherList); /*une una lista con otra actual*/
+    void moveNodeToIndex(int currentIndex, int newIndex); /*mueve un nodo indexado a una posicion requerida*/   
+    void mergeList(const SinglyList<T>& otherList); /*une una lista con otra actual*/
     void mergeSort(); /*ordena la lista. O(n * log n)*/
-
 };
 
 #endif
