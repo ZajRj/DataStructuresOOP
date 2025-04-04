@@ -1,7 +1,7 @@
 #ifndef SINGLYNODE_H
 #define SINGLYNODE_H
 
-#include <cstddef> // Para NULL en C++98
+#include <cstddef>
 
 template <typename T>
 class SinglyNode {

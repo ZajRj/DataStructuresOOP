@@ -2,7 +2,6 @@
 #define SINGLYLIST_H
 
 #include "../Node/SinglyNode.hpp"
-#include <algorithm>
 
 template <typename T>
 class SinglyList {
@@ -665,6 +664,9 @@ public:
     } /*O(1)*/
 
     /* movilidad */
+
+    /*rota la lista k posiciones hacia la derecha
+    oh yes este fue el ejercicio que no me salió en el parcial :p*/
     void rotateRight(int k) {
         /* no hace nada si la lista está vacía o tiene un solo elemento */
         if (this->isEmpty() || this->length == 1) {
@@ -689,8 +691,9 @@ public:
         this->head = new_head;
         this->tail = new_tail;
         this->tail->setNext(NULL);     /* cierra la lista */
-    } /*O(n)*/
+    } /* O(n) */
 
+    /*rota la lista k posiciones hacia la izquierda*/
     void rotateLeft(int k) {
         /* no hace nada si la lista está vacía o tiene un solo elemento */
         if (this->isEmpty() || this->length == 1) {
@@ -715,8 +718,9 @@ public:
         this->head = new_head;
         this->tail = new_tail;
         this->tail->setNext(NULL);     /* cierra la lista */
-    } /* Complejidad: O(n) */
+    } /* O(n) */
 
+    /* invierte el orden de posiciones de la lista */
     void reverseList() {
         /* solo procede si la lista tiene mas de un elemento */
         if (this->length > 1) {

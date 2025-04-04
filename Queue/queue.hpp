@@ -59,7 +59,7 @@ public:
     }
 
     /*getters*/
-    int getSize() const {
+    int getLength() const {
         return length; /*obtiene el tamaño actual de la cola*/
     }
 
