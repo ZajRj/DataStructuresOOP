@@ -1,31 +1,34 @@
 # Compilador y banderas (C++98)
 CXX = g++
 CXXFLAGS = -std=c++98 -Wall -Wextra -I.
+LDFLAGS = 
 
 # Directorios
+SRC_DIR = .
 BUILD_DIR = build
-LIST_DIR = List
-QUEUE_DIR = Queue
-STACK_DIR = Stack
-NODE_DIR = Node
 
-# Fuentes
-SRCS = $(LIST_DIR)/SinglyList.cpp $(QUEUE_DIR)/Queue.cpp $(STACK_DIR)/Stack.cpp $(NODE_DIR)/SinglyNode.cpp $(NODE_DIR)/DoublyNode.cpp
-OBJS = $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+# Fuentes (solo archivos .cpp que necesitan compilación)
+MAIN_SRC = main.cpp
+
+# Objetos
+MAIN_OBJ = $(BUILD_DIR)/$(MAIN_SRC:.cpp=.o)
+
+# Ejecutable
+EXECUTABLE = main
 
 # Reglas
-all: $(BUILD_DIR) main_program
+all: $(BUILD_DIR) $(EXECUTABLE)
 
 $(BUILD_DIR):
-	@mkdir -p $(BUILD_DIR)/$(LIST_DIR) $(BUILD_DIR)/$(QUEUE_DIR) $(BUILD_DIR)/$(STACK_DIR) $(BUILD_DIR)/$(NODE_DIR)
+	@mkdir -p $(BUILD_DIR)
 
-main_program: $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+$(EXECUTABLE): $(MAIN_OBJ)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR) main_program
+	rm -rf $(BUILD_DIR) $(EXECUTABLE)
 
 .PHONY: all clean

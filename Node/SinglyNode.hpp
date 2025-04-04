@@ -1,27 +1,32 @@
 #ifndef SINGLYNODE_H
 #define SINGLYNODE_H
 
+#include <cstddef> // Para NULL en C++98
+
 template <typename T>
-
-class SinglyNode{
-    protected:
-
+class SinglyNode {
+protected:
     T data; /*dato almacenado en el nodo*/
     SinglyNode<T>* next; /*apuntador al nodo siguiente*/
 
-    public:
-    
+public:
     /*constructores*/
-    SinglyNode(T newData); /*constructor si solo se tiene la data (util si es el primer elemento o el ultimo)*/
-    SinglyNode(T newData, SinglyNode<T>* newNext); /*constructor si se tiene un puntero (util para introducciones en medio)*/
+    SinglyNode() : data(T()), next(NULL) {} /*constructor por defecto, inicializa el dato a su valor por defecto y el puntero a null*/
+    
+    SinglyNode(T newData) : data(newData), next(NULL) {} /*coloca puntero a null*/
+    
+    SinglyNode(T newData, SinglyNode<T>* newNext) : 
+        data(newData), next(newNext) {} /*asigna puntero*/
 
     /*getters*/
-    T getData() const; /*devuelve el contenido*/
-    SinglyNode* getNext() const; /*devuelve el puntero*/
+    T getData() const { return this->data; } /*devuelve el contenido*/
+    
+    SinglyNode<T>* getNext() const { return this->next; } /*devuelve el puntero*/
 
     /*setters*/
-    void setData(T newData); /*modifica contenido*/
-    void setNext(SinglyNode<T>* newNext); /*modifica el puntero*/
-
+    void setData(T newData) { this->data = newData; } /*modifica contenido*/
+    
+    void setNext(SinglyNode<T>* newNext) { this->next = newNext; } /*modifica el puntero*/
 };
+
 #endif

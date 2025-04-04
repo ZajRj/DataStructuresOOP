@@ -1,24 +1,35 @@
 #ifndef DOUBLYNODE_H
 #define DOUBLYNODE_H
 
-#include "SinglyNode.h"
+#include "Node/SinglyNode.hpp"
+#include <cstddef>
 
 template <typename T>
-
 class DoublyNode : public SinglyNode<T> {
-    private:
-    DoublyNode<T>* prev; /*apuntador al nodo anterior*/ 
+protected:
+    DoublyNode<T>* prev; /*puntero al nodo anterior*/
 
-    public:
-    /*constructores*/
-    DoublyNode(T newData);
-    DoublyNode(T newData, DoublyNode* prev);
-    DoublyNode(T newData, DoublyNode* prev, DoublyNode* next);
+public:
+    /* Constructores */
+    DoublyNode(T newData) : 
+        SinglyNode<T>(newData), prev(NULL) {} /*constructor básico con solo dato*/
+    
+    DoublyNode(T newData, DoublyNode<T>* newPrev, DoublyNode<T>* newNext) : 
+        SinglyNode<T>(newData, static_cast<SinglyNode<T>*>(newNext)), prev(newPrev) {} /*constructor completo*/
 
-    /*getter*/
-    DoublyNode* getPrev() const;
+    /* Getters */
+    DoublyNode<T>* getPrev() const {
+        return this->prev; /*devuelve puntero al nodo anterior*/
+    }
 
-    /*setter*/
-    void setPrev(DoublyNode* newPrev);
+    DoublyNode<T>* getNext() const {
+        return static_cast<DoublyNode<T>*>(SinglyNode<T>::getNext()); /*devuelve puntero al siguiente nodo (sobrescribe el de SinglyNode)*/
+    }
+
+    /* Setters */
+    void setPrev(DoublyNode<T>* newPrev) {
+        this->prev = newPrev; /*establece puntero al nodo anterior*/
+    }
 };
+
 #endif
