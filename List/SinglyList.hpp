@@ -135,10 +135,10 @@ private:
 
 public:
     /*constructor*/
-    SinglyList() : length(0), head(NULL), tail(NULL) {} /* O(1) */
+    SinglyList() : head(NULL), tail(NULL), length(0) {} /* O(1) */
 
     /*constructor de tipo copia */
-    SinglyList(const SinglyList<T>& originalSinglyList) : length(0), head(NULL), tail(NULL) {
+    SinglyList(const SinglyList<T>& originalSinglyList) : head(NULL), tail(NULL), length(0) {
         SinglyNode<T>* current = originalSinglyList.head;
         while (current != NULL) {
             this->addToEnd(current->getData());

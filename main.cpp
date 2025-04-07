@@ -1,211 +1,76 @@
 #include <iostream>
-#include "Queue/queue.hpp"
-#include <fstream>  
-#include <string>  
+#include <string>
+#include <List/SinglyList.hpp>
 #include <sstream>
 
 using namespace std;
 
-class Jugador {
-    string nombre;
-    Queue<int> mazoActual;
+SinglyList<string> turnStandardInputToStringList(); /* convierte la entrada del archivo a una lista de strings, donde cada string es una linea del archivo */
+SinglyList<int> processLine(const string& line); /* procesa la linea de strings y la convierte en una lista de enteros donde cada entero del string es un nodo de la lista */
+SinglyList<SinglyList<int> > standardInputProcessing(); /* procesa la entrada del archivo */
+SinglyList<SinglyList<int> > fromInputListToProcessedList(SinglyList<SinglyList<int> > listToProcess); /* procesa la lista de listas de enteros y devuelve una lista de listas de enteros donde cada lista esta formateada segun lo esperado */
 
-    public:
-    Jugador() {
-        nombre = "Jugador";
-        mazoActual = Queue<int>();
-    }
-
-    string getNombre() {
-        return nombre;
-    }
-    
-    void setNombre(string nombreEntrada) {
-        this->nombre = nombreEntrada;
-    }
-    
-    int obtenerLongitudMazo() {
-        return mazoActual.getLength();
-    }
-
-    void agregarCarta(int carta) {
-        mazoActual.enqueue(carta);
-    }
-    
-    int sacarCarta() {
-        if (!mazoActual.isEmpty()) {
-            int carta = mazoActual.getFront();
-            return carta;
-        } else {
-            return -1;
-        }
-    }
-
-    void removerCarta() {
-        if (!mazoActual.isEmpty()) {
-            mazoActual.dequeue();
-        }
-    }
-
-    bool tieneMazo() {
-        return !mazoActual.isEmpty();
-    }
-
-    void vaciarMazo() {
-        while (!mazoActual.isEmpty()) {
-            mazoActual.dequeue();
-        }
-    }
-
-    void unirMazoObtenidoDuranteGuerra(Queue<int>& mazoTransferir) {
-        while (!mazoTransferir.isEmpty()) {
-            mazoActual.enqueue(mazoTransferir.getFront());
-            mazoTransferir.dequeue();
-        }
-    }
-};
-
-class Guerra {
-
-    /*es el metodo encargado de obtener el mazo de los jugadores, analiza las primeras dos lineas que 
-    representan el numero de cartas de cada jugador y apila su mazo*/
-    void obtenerMazo(Jugador& jugadorUno, Jugador& jugadorDos, std::ifstream& archivo) {
-        
-        /* procesar mazo del jugadorUno */
-        for (int i = 0; i < 26; i++) {
-                int carta;
-                archivo >> carta;
-                jugadorUno.agregarCarta(carta);
-            }
-
-        /* procesar mazo del jugadorDos */
-        for (int i = 0; i < 26; i++) {
-            int carta;
-            archivo >> carta;
-            jugadorDos.agregarCarta(carta);
-        }
-}
-
-    void jugar(Jugador &jugadorUno, Jugador &jugadorDos) {
-        int cartaJugadorUno;
-        int cartaJugadorDos;
-        int cantidadMovimientos = 0; /* se usa para definir la cantidad de movimientos jugados en una partida */
-        Queue<int> mazoTransferir; /*se usa para guardar el mazo que se obtiene durante la guerra*/
-        while(jugadorUno.tieneMazo() && jugadorDos.tieneMazo()){
-            cartaJugadorUno = jugadorUno.sacarCarta();
-            cartaJugadorDos = jugadorDos.sacarCarta();
-            jugadorUno.removerCarta();
-            jugadorDos.removerCarta();    
-            cantidadMovimientos++;
-            if(cartaJugadorUno > cartaJugadorDos){
-                jugadorUno.agregarCarta(cartaJugadorUno);
-                jugadorUno.agregarCarta(cartaJugadorDos);
-            } else if (cartaJugadorUno < cartaJugadorDos){
-                jugadorDos.agregarCarta(cartaJugadorUno);
-                jugadorDos.agregarCarta(cartaJugadorDos);
-            } else {
-                bool ganoUno = false;
-                bool ganoDos = false;
-                jugar(jugadorUno, jugadorDos, ganoUno, ganoDos, mazoTransferir,cantidadMovimientos);
-                if(ganoUno){
-                    jugadorUno.agregarCarta(cartaJugadorUno);
-                    jugadorUno.agregarCarta(cartaJugadorDos);
-                    jugadorUno.unirMazoObtenidoDuranteGuerra(mazoTransferir);
-                } else if (ganoDos){
-                    jugadorDos.agregarCarta(cartaJugadorUno);
-                    jugadorDos.agregarCarta(cartaJugadorDos);
-                    jugadorDos.unirMazoObtenidoDuranteGuerra(mazoTransferir);
-                } else {
-                break;
-                }    
-        }
-    }
-    if(jugadorUno.tieneMazo() && !jugadorDos.tieneMazo()){
-        mostrarResultados("ganoUno", jugadorUno, jugadorDos,cantidadMovimientos);
-    } else if (!jugadorUno.tieneMazo() && jugadorDos.tieneMazo()){
-        mostrarResultados("ganoDos", jugadorUno, jugadorDos,cantidadMovimientos);
-    } else if (!jugadorUno.tieneMazo() && !jugadorDos.tieneMazo()){
-        mostrarResultados("empate", jugadorUno, jugadorDos,cantidadMovimientos);
-    }
-}
-
-    void jugar(Jugador& jugadorUno, Jugador& jugadorDos, bool& ganoUno, bool& ganoDos, Queue<int>& mazoTransferir, int &cantidadMovimientos) {
-        /* se juega una guerra entre los dos jugadores, se comparan las cartas y se determina el ganador */
-        if(jugadorUno.obtenerLongitudMazo() != 0 || jugadorDos.obtenerLongitudMazo() != 0) {
-
-        int cartaJugadorUnoPrimera = jugadorUno.sacarCarta();
-        int cartaJugadorDosPrimera = jugadorDos.sacarCarta();
-        jugadorUno.removerCarta();
-        jugadorDos.removerCarta();
-        cantidadMovimientos++;
-        int cartaJugadorUnoComparar = jugadorUno.sacarCarta();
-        int cartaJugadorDosComparar = jugadorDos.sacarCarta();
-        cantidadMovimientos++;
-        jugadorUno.removerCarta();
-        jugadorDos.removerCarta();
-        mazoTransferir.enqueue(cartaJugadorUnoPrimera);
-        mazoTransferir.enqueue(cartaJugadorDosPrimera);
-        mazoTransferir.enqueue(cartaJugadorUnoComparar);
-        mazoTransferir.enqueue(cartaJugadorDosComparar);
-        
-        if (cartaJugadorUnoComparar == cartaJugadorDosComparar) {
-            this->jugar(jugadorUno,jugadorDos, ganoUno, ganoDos, mazoTransferir, cantidadMovimientos);
-        } if (cartaJugadorUnoComparar > cartaJugadorDosComparar || jugadorDos.obtenerLongitudMazo() == 0) {
-            ganoUno = true;
-        } else if (cartaJugadorUnoComparar < cartaJugadorDosComparar || jugadorUno.obtenerLongitudMazo() == 0) {
-            ganoDos = true;
-        }
-}
-}
-    /*es el metodo encargado de mostrar los resultados de la partida, recibe el estado del juego y los jugadores
-    y muestra el resultado correspondiente*/
-    void mostrarResultados(string estadoJuego, Jugador& jugadorUno, Jugador& jugadorDos, int cantidadMovimientos) {
-        if(estadoJuego == "empate"){
-            cout << "Empate " << endl;
-        } else if (estadoJuego == "ganoUno"){
-            cout << "Ganador: " << jugadorUno.getNombre() << endl;
-        } else if (estadoJuego == "ganoDos"){
-            cout << "Ganador: " << jugadorDos.getNombre() << endl;
-        } else {
-            cout << "No se ha jugado ninguna partida." << endl;
-        }
-        cout << "Cantidad de movimientos: " << cantidadMovimientos << endl;
-        jugadorUno.vaciarMazo();
-        jugadorDos.vaciarMazo();
-    }
-
-    public:
-
-    Guerra(){
-        Jugador jugadorUno;
-        Jugador jugadorDos;
-        ifstream archivo("entrada.txt");
-        if(archivo.is_open()) {
-        int cantidadPartidas=0;
-        int partidaActual;
-        string nombreUno, nombreDos;
-        archivo >> cantidadPartidas;
-        cout << "Ingrese el nombre del jugador uno: ";
-        cin >> nombreUno;
-        cout << "Ingrese el nombre del jugador dos: ";
-        cin >> nombreDos;
-        jugadorUno.setNombre(nombreUno);
-        jugadorDos.setNombre(nombreDos);
-        for(partidaActual = 0; partidaActual < cantidadPartidas; partidaActual++){
-        obtenerMazo(jugadorUno, jugadorDos, archivo);
-        cout << "Partida " << partidaActual + 1 << ":" << endl;
-        cout << jugadorUno.getNombre() << " vs " << jugadorDos.getNombre() << endl;
-        jugar(jugadorUno, jugadorDos);
-        }
-        archivo.close();
-        }else {
-            cout << "No se pudo obtener la entrada." << endl;
-        }
-    }
-};
 
 int main() {
-    /*se crea un objeto de la clase Guerra, que se encarga de gestionar el juego*/
-    Guerra guerra;
     return 0;
+}
+
+SinglyList<string> turnStandardInputToStringList(){
+    SinglyList<string> listToReturn; /* lista de strings que se va a retornar */
+    string currentLine; /* variable donde se guardara la linea :) */
+    while (getline(cin, currentLine)) {
+        listToReturn.addToEnd(currentLine);
+        if (cin.eof()) { /* si se llega al final del archivo, se sale del bucle */
+            break;
+        }
+    }
+    return listToReturn; /* retorna la lista de strings */
+    /* si se llega al final del archivo, se sale del bucle */
+}
+
+SinglyList<int> processLine(const string& line){
+    SinglyList<int> listToReturn; /* lista de enteros que sera retornada */
+    stringstream stringstreamedLine(line); /* convierte la linea de string a un stringstream para poder procesarla */
+    int associatedLineNumber; /* numero de linea asociado al momento */
+    while(stringstreamedLine >> associatedLineNumber){ 
+        listToReturn.addToEnd(associatedLineNumber); /* agrega al final la linea, de forma que se pos(n) = linea(n+1) del archivo*/
+        if(stringstreamedLine.peek() == ','){ /* si el siguiente caracter es una coma, se ignora */
+            stringstreamedLine.ignore();
+        }
+    }
+    return listToReturn; /* retorna la lista de enteros :) */
+}
+
+SinglyList<SinglyList<int> > standardInputProcessing(){
+    SinglyList<SinglyList<int> > listToReturn;
+    SinglyList<string> lines = turnStandardInputToStringList(); /* convierte el archivo de entrada estandar a una lista de strings*/
+    while(!lines.isEmpty()){ /* mientras existan lineas aun por procesar */
+        listToReturn.addToEnd(processLine(lines.findElementAt(0))); /* consulta la primera posicion de la lista de strings */
+        lines.removeFromStart(); /* remueve el primer elemento para permitir el flujo normal */
+    }
+    return listToReturn;
+}
+
+SinglyList<SinglyList<int> > fromInputListToProcessedList(SinglyList<SinglyList<int> > listToProcess);{
+    SinglyList<SinglyList<int> > listToProcess = standardInputProcessing();
+    SinglyList<SinglyList<int> > listToReturn;
+    int currentPosition = 0;
+    /* mientras existan lineas aun por procesar */
+        while(!listToProcess.isEmpty()){
+            SinglyList<int>* pointerToCurrentLine = new SinglyList<int>(listToProcess.findElementAt(currentPosition)); /* consulta la posicion actual de la lista de listas */
+            if(pointerToCurrentLine->isEmpty()){
+                listToProcess.removeFromStart(); /* remueve el primer elemento para permitir el flujo normal */
+                delete pointerToCurrentLine; /* libera la memoria del puntero */
+            }else{
+                listToReturn.addToEnd(pointerToCurrentLine->findElementAt(0));
+                pointerToCurrentLine->removeFromStart(); /* remueve el primer elemento para permitir el flujo normal */
+                if(pointerToCurrentLine->isEmpty()){
+                    delete pointerToCurrentLine; /* libera la memoria del puntero */
+            }
+        }
+        currentPosition++;
+        if(currentPosition == listToProcess.getSize()){
+            currentPosition = 0; /* reinicia la posicion actual */
+        }
+}
 }
