@@ -8,15 +8,15 @@ using namespace std;
 SinglyList<string> readLinesFromInput(); /* convierte la entrada del archivo a una lista de strings, donde cada string es una linea del archivo */
 SinglyList<int> parseLineToInts(const string& line); /* procesa la linea de strings y la convierte en una lista de enteros donde cada entero del string es un nodo de la lista */
 SinglyList<SinglyList<int> > makeListOfIntLists(); /* crea una lista de listas de enteros */
-void standardInput(SinglyList<SinglyList<int> > &processedList);
+SinglyList<SinglyList<int> > standardInput();
 SinglyList<SinglyList<int> > fromInputListToProcessedList(SinglyList<SinglyList<int> > listToProcess); /* procesa la lista de listas de enteros y devuelve una lista de listas de enteros donde cada lista esta formateada segun lo esperado */
 void printListOfIntLists(const SinglyList<SinglyList<int> >& listToPrint);
+void standardOutput(SinglyList<SinglyList<int> > compactList);
 
 int main() {
-    SinglyList<SinglyList<int> > formatInput;
-    standardInput(formatInput);
-    cout << "Lista Procesada:" << endl;
-    printListOfIntLists(formatInput);
+    SinglyList<SinglyList<int> > actualList = standardInput();
+    printListOfIntLists(actualList);
+    standardOutput(actualList);
     return 0;
 }
 
@@ -38,7 +38,7 @@ SinglyList<int> parseLineToInts(const string& line){
     stringstream stringstreamedLine(line); /* convierte la linea de string a un stringstream para poder procesarla */
     int associatedLineNumber; /* numero de linea asociado al momento */
     while(stringstreamedLine >> associatedLineNumber){ 
-        listToReturn.addToEnd(associatedLineNumber); /* agrega al final la linea, de forma que se pos(n) = linea(n+1) del archivo*/
+        listToReturn.addToEnd(associatedLineNumber); /* agrega al final la linea, de forma que se pos(n) = linea(n+1) del archivo */
         if(stringstreamedLine.peek() == ' '){ /* si el siguiente caracter es un espacio, se ignora */
             stringstreamedLine.ignore();
         }
@@ -56,54 +56,84 @@ SinglyList<SinglyList<int> > makeListOfIntLists(){
     return listToReturn;
 }
 
-SinglyList<SinglyList<int> > fromInputListToProcessedList(SinglyList<SinglyList<int> > listToProcess){
-    SinglyList<SinglyList<int> > listToReturn;
-    int currentPosition = 1;
-    int currentNumber = 0;
+SinglyList<SinglyList<int> > fromInputListToProcessedList(SinglyList<SinglyList<int> >* listToProcess) {
+    SinglyList<SinglyList<int> > result;
+    /* verificacion de seguridad para evitar datos corruptos */
+    if(listToProcess == NULL || listToProcess->isEmpty()) {
+        return result;
+    }
 
-    /* mientras existan lineas aun por procesar */
-    while(!listToProcess.isEmpty()){
-        SinglyList<int> listToCompact;
-        if(!(listToProcess.findElementAt(currentPosition)).isEmpty()){ /* mientras el lugar a dónde apunta el puntero de listas de enteros sea distinto a NULL procederá esta rutina*/
-            currentNumber = (listToProcess.findElementAt(currentPosition)).findElementAt(1); /* consulta el primer nodo */
-            cout << "pene" << endl;
-            listToCompact.addToEnd(currentNumber); /* agrega al final el numero que aparezca allí */
-            cout << "pene" << endl;
-            (listToProcess.findElementAt(currentPosition)).removeFromStart(); /* remueve ese número de la lista a procesar*/
-            cout << "pene" << endl;
-        }else{
-            listToProcess.removeElementAt(currentPosition);
-        }
-
-        if(currentPosition == listToProcess.getLength()){
-            listToReturn.addToEnd(listToCompact);
-            listToCompact.clear();
+    /* extrae el número de casos de prueba (primer numero del archivo o primer elemento de la lista del primer elemento de listas)*/
+    int numTestCases = 0;
+    if(!listToProcess->findElementAt(0).isEmpty()) {
+        numTestCases = listToProcess->findElementAt(0).findElementAt(0);
+       /* eliminamos el dato leído porque ya no nos interesa mantenerlo */
+        listToProcess->findElementAt(0).removeFromStart();
+        if(listToProcess->findElementAt(0).isEmpty()) {
+            listToProcess->removeElementAt(0);
         }
     }
-    return listToReturn;
-};
 
-void standardInput(SinglyList<SinglyList<int> > &processedList){
-    SinglyList<SinglyList<int> > intList = makeListOfIntLists();
-    processedList = fromInputListToProcessedList(intList);
+    /* verificación adicional para seguridad */
+    if(numTestCases <= 0 || numTestCases > listToProcess->getLength()) {
+        return result; 
+    }
+
+    /* procesamos exactamente numTestCases listas */
+    for(int currentInnerPosition = 0; currentInnerPosition < numTestCases; currentInnerPosition++) {
+        /* creamos una variable llamada currentInnerPosition para saber cual posicion de la lista interna se debe consultar, mientras este cubierta por el maximo numero de casos que pudimos extraer */
+        SinglyList<int> auxiliarInnerList;
+        if(listToProcess->isEmpty()) break; /* si la lista esta vacia, rompe el for para evitar repeticiones innecesarias y posibles casos de segmentacion */
+        for(int currentExternalPosition = 0; currentExternalPosition < listToProcess->getLength(); currentExternalPosition++){ 
+            /* creamos la variable llamada currentExternalPosition, que esta recorrera cada pos de la lista de listas una a la vez */
+            SinglyList<int> auxiliarList = listToProcess->findElementAt(currentExternalPosition); /* para evitar crear punteros innecesarios, utilizaremos una variable para copiar la lista que iteraremos */
+            int currentNumber = auxiliarList.findElementAt(currentInnerPosition); /* revisa la posicion que nos interesa al momento */
+            if(currentNumber){ /* si el numero entregado por la lista es un numero valido, procedemos a introducirlo en la lista que luego introduciremos a la lista de listas, al final */
+                auxiliarInnerList.addToEnd(currentNumber); /* introduce */
+            }
+        }
+    result.addToEnd(auxiliarInnerList); /* al final de cada for interno, introduce la lista creada a la lista de listas */
+}
+    return result; /* retorna la lista de listas */
 }
 
-void printListOfIntLists(const SinglyList<SinglyList<int> >& listToPrint){
-    if(listToPrint.isEmpty()){
-        cout << "La lista de listas está vacía." << endl;
-        return;
-    }
-    for(int i = 0; i < listToPrint.getLength(); ++i){ // Usando getLength()
-        cout << "Lista [" << i << "]: ";
-        SinglyList<int>* currentList = (listToPrint.findElementAt(i)).shallowCopy();
-        if (currentList != NULL) {
-            for(int j = 0; j < currentList->getLength(); ++j){ // Usando getLength()
-                cout << currentList->findElementAt(j) << " ";
+SinglyList<SinglyList<int> > standardInput(){
+    SinglyList<SinglyList<int> > intList = makeListOfIntLists();
+    return fromInputListToProcessedList(&intList);
+}
+
+void printListOfIntLists(const SinglyList<SinglyList<int> >& list) {
+    for(int i = 0; i < list.getLength(); i++) {
+        std::cout << "Lista " << i << ": [";
+        
+        SinglyList<int> innerList = list.findElementAt(i);
+        for(int j = 0; j < innerList.getLength(); j++) {
+            std::cout << innerList.findElementAt(j);
+            if(j < innerList.getLength() - 1) {
+                std::cout << ", ";
             }
-            cout << endl;
-            delete currentList;
-        } else {
-            cout << "Error: No se pudo obtener la sublista en el índice " << i << endl;
         }
+        
+        std::cout << "]" << std::endl;
     }
+}
+
+void standardOutput(SinglyList<SinglyList<int> > compactList){
+    while(!compactList.isEmpty()){
+        SinglyList<int> auxiliarList = compactList.findElementAt(0);
+        compactList.removeFromStart();
+        int dayIterator = 1;
+        if(auxiliarList.getLength() > 1){
+        while(!auxiliarList.isEmpty()){
+            if(auxiliarList.findElementAt(0) < auxiliarList.findElementAt(1)){
+                cout << dayIterator << endl;
+                break; 
+            }
+        auxiliarList.removeBatchFromStart(2);
+        dayIterator++;
+        }
+    }else{
+        cout << "alive forever" << endl;
+    }
+}
 }
