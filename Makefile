@@ -8,13 +8,13 @@ SRC_DIR = .
 BUILD_DIR = build
 
 # Fuentes (solo archivos .cpp que necesitan compilación)
-MAIN_SRC = main.cpp
+MAIN_SRC = elfos.cpp
 
 # Objetos
 MAIN_OBJ = $(BUILD_DIR)/$(MAIN_SRC:.cpp=.o)
 
 # Ejecutable
-EXECUTABLE = main
+EXECUTABLE = elfos
 
 # Reglas
 all: $(BUILD_DIR) $(EXECUTABLE)
