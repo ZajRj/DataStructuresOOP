@@ -1,8 +1,8 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "../Node/SinglyNode.hpp"
-#include "../Stack/Stack.hpp"  /* para la funcion reverse() */
+#include "../../Node/SinglyNode.hpp"
+#include "../../Stack/Stack.hpp"  /* para la funcion reverse() */
 #include <cstddef>  /* para null */
 
 template <typename T>

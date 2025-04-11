@@ -2,7 +2,7 @@
 #define STACK_H
 
 #include <cstddef>  /* para null */
-#include "../Node/SinglyNode.hpp"
+#include "../../Node/SinglyNode.hpp"
 
 template <typename T>
 class Stack {

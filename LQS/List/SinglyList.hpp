@@ -1,7 +1,8 @@
 #ifndef SINGLYLIST_H
 #define SINGLYLIST_H
 
-#include "../Node/SinglyNode.hpp"
+#include "../../Node/SinglyNode.hpp"
+#include <iostream>
 
 template <typename T>
 class SinglyList {
