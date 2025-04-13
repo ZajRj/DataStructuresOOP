@@ -4,6 +4,7 @@
 #include "../Node/BinaryTreeNode.hpp"
 #include <iostream>
 #include <list>
+#include <algorithm>
 
 template <typename T>
 class BinaryTree {
@@ -55,6 +56,21 @@ class BinaryTree {
         );
     } /* O(n) */
 
+    /* metodo auxiliar para llenar un arbol de forma recursiva desde una inOrderList y una preOrderList */
+    BinaryTreeNode<T>* buildFromPreIn(
+        typename std::list<T>::iterator inOrderBegin,
+        typename std::list<T>::iterator inOrderEnd,
+        typename std::list<T>::iterator& preOrderIterator){
+            if( inOrderBegin == inOrderEnd ) return NULL; /* si los iteradores son iguales (condicion de parada), retornar caso base */
+            T currentElement = *preOrderIterator++; /* obtiene el elemento donde apunta el iterador de la lista preorden y aumenta su posicion al siguiente elemento */
+            BinaryTreeNode<T>* newNode = new BinaryTreeNode<T>(currentElement); /* genera un nuevo nodo con este dato obtenido (duplicacion) */
+            /* ocupamos una busqueda lineal desde el inOrderList */
+            typename std::list<T>::iterator iteratorOnPosition = inOrderBegin;
+            while (iteratorOnPosition != inOrderEnd && *iteratorOnPosition != currentElement) ++iteratorOnPosition;
+
+            node
+        }
+
     public:
 
     /* constructores */
@@ -91,17 +107,26 @@ class BinaryTree {
 
     /* getters */
 
-    BinaryTreeNode<T>* getRoot(){ return this->root; }
+    BinaryTreeNode<T>* getRoot(){ return this->root; } /* O(1) */
 
-    int getSize(){ return this->size; }
+    int getSize(){ return this->size; } /* O(1) */
 
     /* metodos que operan al arbol */
 
-    void buildTreePE(std::list<T>){
+    /* metodo publico para construir un Arbol Binario a partir de dos listas InOrder and PostOrder */
+    void buildTreePE(std::list<T> inOrderList, std::list<t> preOrderList){
+        if(inOrderList.size() != preOrderList.size() ) return; /* si las listas tienen cantidades de elementos distintos, retornar */
 
+        std::list<T> auxiliarInOrderList = inOrderList;
+        std::list<T> auxiliarPreOrderList = preOrderList;
+
+        typename std::list<T>::iterator preOrderIterator = auxiliarPreOrderList.begin();
+        root = buildFromPreIn(auxiliarInOrderList.begin(), auxiliarInOrderList.end(), preOrderIterator); /* ocupa el metodo privado, el que hace todo el trabajo recursivo*/
     }
 
-    void buildTreePO()
+    void buildTreePO((std::list<T> inOrderList, std::list<t> postOrderList){
+
+    }
 
 };
 #endif
