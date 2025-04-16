@@ -29,11 +29,11 @@ class BinaryTreeNode {
     segun como fueron enviados por parametro, el primer dato por parametro es el dato, el segundo es el pointer al hijo izquierdo y el tercero es el pointer al hijo derecho */
     
     /* getters */
-    T getData() const { return this->data; } /* devuelve contenido */
+    T getData() const { return data; } /* devuelve contenido */
     
-    BinaryTreeNode<T>* getLeft() const { return this->left; } /* devuelve el puntero al nodo izquierdo */
+    BinaryTreeNode<T>* getLeft() const { return left; } /* devuelve el puntero al nodo izquierdo */
     
-    BinaryTreeNode<T>* getRight() const { return this->right; } /* devuelve el puntero al nodo derecho */
+    BinaryTreeNode<T>* getRight() const { return right; } /* devuelve el puntero al nodo derecho */
     
     /* setters */
     void setData(T newData ) { this->data = newData; } /* modifica el dato actual */
