@@ -12,243 +12,204 @@
 template <typename T>
 class BinaryTree {
 protected:
-    /* atributos de la clase */
-    BinaryTreeNode<T>* root; /* apuntador a la raiz del arbol */
-    int size; /* cantidad de nodos en el arbol */
+    BinaryTreeNode<T>* root; /* puntero al nodo raiz del arbol */
+    int size;               /* cantidad total de nodos en el arbol */
 
-    /* metodos restringidos; su uso es permitido dentro de la misma clase por otros metodos publicos */
-
-    /*  verifica si un nodo es nulo, recibe un puntero al nodo a verificar y retorna 
-    true si es nulo, false si no */
+    /* verifica si un nodo es nulo */
     bool isNullNode(BinaryTreeNode<T>* node) const {
-        return node == NULL;
+        return node == NULL; /* compara el puntero con NULL y retorna true si son iguales */
     }
 
-    /* verifica si alguno de dos nodos es nulo, firstNode es el primer nodo a verificar y secondNode
-     el segundo nodo a verificar, retorna true si alguno es nulo, false si ambos son validos */
+    /* verifica si alguno de dos nodos es nulo */
     bool isNullNode(BinaryTreeNode<T>* firstNode, BinaryTreeNode<T>* secondNode) const {
-        return isNullNode(firstNode) || isNullNode(secondNode);
+        return isNullNode(firstNode) /* verifica si el primer nodo es nulo */ 
+               || isNullNode(secondNode); /* o si el segundo nodo es nulo */
     }
 
-    /* inserta un subarbol en la posicion especificada, currentNode es el nodo actual en la recursion el parametro subTreeRoot
-     es la raiz del subarbol a insertar, left indica si se inserta a la izquierda (true) o derecha (false), 
-     retorna el puntero al nodo modificado */
+    /* inserta un subarbol en la posicion especificada */
     BinaryTreeNode<T>* auxiliarInsertSubTree(BinaryTreeNode<T>* currentNode, BinaryTreeNode<T>* subTreeRoot, bool left) {
-        if(!subTreeRoot) return currentNode;
+        if(!subTreeRoot) return currentNode; /* si el subarbol a insertar es nulo, retorna el nodo actual sin cambios */
         
-        if(!currentNode) {
-            int subTreeSize = countNodes(subTreeRoot);
-            if(size > INT_MAX - subTreeSize) return currentNode;
-            size += subTreeSize;
-            return cloneTree(subTreeRoot);
+        if(!currentNode) { /* si el nodo actual es nulo */
+            int subTreeSize = countNodes(subTreeRoot); /* cuenta los nodos del subarbol a insertar */
+            if(size > INT_MAX - subTreeSize) return currentNode; /* evita desbordamiento de enteros */
+            size += subTreeSize; /* actualiza el tamaño total del arbol */
+            return cloneTree(subTreeRoot); /* retorna una copia del subarbol */
         }
         
-        if(left) {
-            currentNode->setLeft(auxiliarInsertSubTree(currentNode->getLeft(), subTreeRoot, left));
-        } else {
-            currentNode->setRight(auxiliarInsertSubTree(currentNode->getRight(), subTreeRoot, left));
+        if(left) { /* si se debe insertar a la izquierda */
+            currentNode->setLeft(auxiliarInsertSubTree(currentNode->getLeft(), subTreeRoot, left)); /* inserta recursivamente en el subarbol izquierdo */
+        } else { /* si se debe insertar a la derecha */
+            currentNode->setRight(auxiliarInsertSubTree(currentNode->getRight(), subTreeRoot, left)); /* inserta recursivamente en el subarbol derecho */
         }
         
-        return currentNode;
+        return currentNode; /* retorna el nodo actual con los cambios realizados */
     }
 
     /* elimina el subarbol izquierdo y actualiza el tamaño */
     void removeLeftSubTree() {
-        if(isEmpty()) return;
-        BinaryTreeNode<T>* leftBranch = root->getLeft();
-        if(leftBranch) {
-            int removed = countNodes(leftBranch);
-            auxiliarClear(leftBranch);
-            root->setLeft(NULL);
-            size = (size > removed) ? size - removed : 0;
+        if(isEmpty()) return; /* si el arbol esta vacio, no hay nada que eliminar */
+        BinaryTreeNode<T>* leftBranch = root->getLeft(); /* obtiene el subarbol izquierdo */
+        if(leftBranch) { /* si existe el subarbol izquierdo */
+            int removed = countNodes(leftBranch); /* cuenta cuantos nodos se van a eliminar */
+            auxiliarClear(leftBranch); /* elimina todos los nodos del subarbol izquierdo */
+            root->setLeft(NULL); /* desvincula el subarbol izquierdo de la raiz */
+            size = (size > removed) ? size - removed : 0; /* actualiza el tamaño total */
         }
     }
 
-    /* 
-     * elimina el subarbol derecho y actualiza el tamaño
-     */
+    /* elimina el subarbol derecho y actualiza el tamaño */
     void removeRightSubTree() {
-        if(isEmpty()) return;
-        BinaryTreeNode<T>* rightBranch = root->getRight();
-        if(rightBranch) {
-            int removed = countNodes(rightBranch);
-            auxiliarClear(rightBranch);
-            root->setRight(NULL);
-            size = (size > removed) ? size - removed : 0;
+        if(isEmpty()) return; /* si el arbol esta vacio, no hay nada que eliminar */
+        BinaryTreeNode<T>* rightBranch = root->getRight(); /* obtiene el subarbol derecho */
+        if(rightBranch) { /* si existe el subarbol derecho */
+            int removed = countNodes(rightBranch); /* cuenta cuantos nodos se van a eliminar */
+            auxiliarClear(rightBranch); /* elimina todos los nodos del subarbol derecho */
+            root->setRight(NULL); /* desvincula el subarbol derecho de la raiz */
+            size = (size > removed) ? size - removed : 0; /* actualiza el tamaño total */
         }
     }
 
-    /* 
-     * cuenta los nodos en un subarbol
-     * @param node: raiz del subarbol a contar
-     * @return: cantidad de nodos en el subarbol
-     */
+    /* cuenta los nodos en un subarbol */
     int countNodes(BinaryTreeNode<T>* node) const {
-        if(!node) return 0;
-        return 1 + countNodes(node->getLeft()) + countNodes(node->getRight());
+        if(!node) return 0; /* si el nodo es nulo, retorna 0 */
+        return 1 /* cuenta el nodo actual */ 
+               + countNodes(node->getLeft()) /* suma los nodos del subarbol izquierdo */
+               + countNodes(node->getRight()); /* suma los nodos del subarbol derecho */
     }
 
-    /* 
-     * elimina un nodo con el dato especificado
-     * @param currentNode: nodo actual en la recursion
-     * @param dataToDelete: dato a buscar y eliminar
-     * @return: puntero al nodo modificado
-     */
+    /* elimina un nodo con el dato especificado */
     BinaryTreeNode<T>* auxiliarRemove(BinaryTreeNode<T>* currentNode, const T& dataToDelete) {
-        if(!currentNode) return NULL;
+        if(!currentNode) return NULL; /* si el nodo actual es nulo, retorna nulo */
         
-        if(currentNode->getData() == dataToDelete) {
-            if(!currentNode->getLeft()) {
-                BinaryTreeNode<T>* temp = currentNode->getRight();
-                delete currentNode;
-                size = (size > 0) ? size - 1 : 0;
-                return temp;
-            } else if(!currentNode->getRight()) {
-                BinaryTreeNode<T>* temp = currentNode->getLeft();
-                delete currentNode;
-                size = (size > 0) ? size - 1 : 0;
-                return temp;
+        if(currentNode->getData() == dataToDelete) { /* si encontramos el nodo a eliminar */
+            if(!currentNode->getLeft()) { /* si no tiene hijo izquierdo */
+                BinaryTreeNode<T>* temp = currentNode->getRight(); /* guardamos el hijo derecho */
+                delete currentNode; /* liberamos la memoria del nodo actual */
+                size = (size > 0) ? size - 1 : 0; /* actualizamos el tamaño */
+                return temp; /* retornamos el hijo derecho para reemplazar al nodo eliminado */
+            } else if(!currentNode->getRight()) { /* si no tiene hijo derecho */
+                BinaryTreeNode<T>* temp = currentNode->getLeft(); /* guardamos el hijo izquierdo */
+                delete currentNode; /* liberamos la memoria del nodo actual */
+                size = (size > 0) ? size - 1 : 0; /* actualizamos el tamaño */
+                return temp; /* retornamos el hijo izquierdo para reemplazar al nodo eliminado */
             }
             
-            BinaryTreeNode<T>* temp = currentNode->getLeft();
-            while(temp->getRight()) {
-                temp = temp->getRight();
+            /* si el nodo tiene ambos hijos */
+            BinaryTreeNode<T>* temp = currentNode->getLeft(); /* empezamos por el hijo izquierdo */
+            while(temp->getRight()) { /* buscamos el nodo mas a la derecha en el subarbol izquierdo */
+                temp = temp->getRight(); /* avanzamos al siguiente hijo derecho */
             }
-            currentNode->setData(temp->getData());
-            currentNode->setLeft(auxiliarRemove(currentNode->getLeft(), temp->getData()));
-        } else {
-            currentNode->setLeft(auxiliarRemove(currentNode->getLeft(), dataToDelete));
-            currentNode->setRight(auxiliarRemove(currentNode->getRight(), dataToDelete));
+            currentNode->setData(temp->getData()); /* copiamos el dato del nodo encontrado */
+            currentNode->setLeft(auxiliarRemove(currentNode->getLeft(), temp->getData())); /* eliminamos el nodo duplicado */
+        } else { /* si no es el nodo que buscamos */
+            currentNode->setLeft(auxiliarRemove(currentNode->getLeft(), dataToDelete)); /* buscamos en el subarbol izquierdo */
+            currentNode->setRight(auxiliarRemove(currentNode->getRight(), dataToDelete)); /* buscamos en el subarbol derecho */
         }
-        return currentNode;
+        return currentNode; /* retornamos el nodo actual */
     }
 
-    /* 
-     * elimina todos los nodos del arbol
-     * @param currentNode: nodo actual en la recursion
-     */
+    /* elimina todos los nodos del arbol */
     void auxiliarClear(BinaryTreeNode<T>* currentNode) {
-        if(!currentNode) return;
-        auxiliarClear(currentNode->getLeft());
-        auxiliarClear(currentNode->getRight());
-        delete currentNode;
-        size = (size > 0) ? size - 1 : 0;
+        if(!currentNode) return; /* si el nodo es nulo, terminamos la recursion */
+        auxiliarClear(currentNode->getLeft()); /* eliminamos el subarbol izquierdo */
+        auxiliarClear(currentNode->getRight()); /* eliminamos el subarbol derecho */
+        delete currentNode; /* liberamos la memoria del nodo actual */
+        size = (size > 0) ? size - 1 : 0; /* actualizamos el tamaño */
     }
 
-    /* 
-     * calcula la altura del arbol
-     * @param currentNode: nodo actual en la recursion
-     * @return: altura del subarbol
-     */
+    /* calcula la altura del arbol */
     int auxiliarGetHeight(BinaryTreeNode<T>* currentNode) const {
-        if(!currentNode) return 0;
-        return 1 + std::max(auxiliarGetHeight(currentNode->getLeft()),
-                           auxiliarGetHeight(currentNode->getRight()));
+        if(!currentNode) return 0; /* si el nodo es nulo, su altura es 0 */
+        return 1 /* contamos el nodo actual */ 
+               + std::max(auxiliarGetHeight(currentNode->getLeft()), /* altura del subarbol izquierdo */
+                         auxiliarGetHeight(currentNode->getRight())); /* altura del subarbol derecho */
     }
 
-    /* 
-     * cuenta la cantidad de hojas en el arbol
-     * @param currentNode: nodo actual en la recursion
-     * @return: cantidad de hojas en el subarbol
-     */
+    /* cuenta la cantidad de hojas en el arbol */
     int auxiliarCountLeaves(BinaryTreeNode<T>* currentNode) const {
-        if(!currentNode) return 0;
-        if(!currentNode->getLeft() && !currentNode->getRight()) return 1;
-        return auxiliarCountLeaves(currentNode->getLeft()) + 
-               auxiliarCountLeaves(currentNode->getRight());
+        if(!currentNode) return 0; /* si el nodo es nulo, no es una hoja */
+        if(!currentNode->getLeft() && !currentNode->getRight()) return 1; /* si no tiene hijos, es una hoja */
+        return auxiliarCountLeaves(currentNode->getLeft()) /* contamos hojas en subarbol izquierdo */
+               + auxiliarCountLeaves(currentNode->getRight()); /* contamos hojas en subarbol derecho */
     }
 
-    /* 
-     * obtiene los valores de las hojas del arbol
-     * @param currentNode: nodo actual en la recursion
-     * @param leavesList: lista donde se almacenan los valores
-     */
+    /* obtiene los valores de las hojas del arbol */
     void auxiliarGetLeaves(BinaryTreeNode<T>* currentNode, std::list<T>& leavesList) const {
-        if(!currentNode) return;
+        if(!currentNode) return; /* si el nodo es nulo, terminamos la recursion */
         
-        if(!currentNode->getLeft() && !currentNode->getRight()) {
-            leavesList.push_back(currentNode->getData());
-            return;
+        if(!currentNode->getLeft() && !currentNode->getRight()) { /* si es una hoja */
+            leavesList.push_back(currentNode->getData()); /* agregamos su dato a la lista */
+            return; /* terminamos esta rama de recursion */
         }
         
-        auxiliarGetLeaves(currentNode->getLeft(), leavesList);
-        auxiliarGetLeaves(currentNode->getRight(), leavesList);
+        auxiliarGetLeaves(currentNode->getLeft(), leavesList); /* buscamos hojas en subarbol izquierdo */
+        auxiliarGetLeaves(currentNode->getRight(), leavesList); /* buscamos hojas en subarbol derecho */
     }
 
-    /* 
-     * clona un arbol recursivamente
-     * @param currentRecNode: nodo actual en la recursion
-     * @return: puntero al nuevo nodo clonado
-     */
+    /* clona un arbol recursivamente */
     static BinaryTreeNode<T>* cloneTree(const BinaryTreeNode<T>* currentRecNode) {
-        if(!currentRecNode) return NULL;
+        if(!currentRecNode) return NULL; /* si el nodo es nulo, retornamos nulo */
         
-        return new BinaryTreeNode<T>(
-            currentRecNode->getData(),
-            cloneTree(currentRecNode->getLeft()),
-            cloneTree(currentRecNode->getRight())
+        return new BinaryTreeNode<T>( /* creamos un nuevo nodo con */
+            currentRecNode->getData(), /* el mismo dato */
+            cloneTree(currentRecNode->getLeft()), /* clon del subarbol izquierdo */
+            cloneTree(currentRecNode->getRight()) /* clon del subarbol derecho */
         );
     }
 
-    /* 
-     * calcula la suma de todos los valores del arbol
-     * @param currentNode: nodo actual en la recursion
-     * @return: suma acumulada de los valores
-     */
+    /* calcula la suma de todos los valores del arbol */
     T auxiliarGetWeight(BinaryTreeNode<T>* currentNode) const {
-        if(!currentNode) return T();
-        return currentNode->getData() + 
-               auxiliarGetWeight(currentNode->getLeft()) + 
-               auxiliarGetWeight(currentNode->getRight());
+        if(!currentNode) return T(); /* si el nodo es nulo, retorna valor por defecto */
+        return currentNode->getData() /* valor del nodo actual */
+               + auxiliarGetWeight(currentNode->getLeft()) /* suma de subarbol izquierdo */
+               + auxiliarGetWeight(currentNode->getRight()); /* suma de subarbol derecho */
     }
 
-    /* 
-     * busca un subarbol dentro del arbol
-     * @param current: nodo actual en el arbol principal
-     * @param subRoot: nodo actual en el subarbol buscado
-     * @return: true si el subarbol esta contenido, false si no
-     */
+    /* busca un subarbol dentro del arbol */
     bool findSubTree(BinaryTreeNode<T>* current, BinaryTreeNode<T>* subRoot) const {
-        if(!subRoot) return true;
-        if(!current) return false;
+        if(!subRoot) return true; /* un arbol vacio siempre esta contenido */
+        if(!current) return false; /* si el arbol actual es vacio y el buscado no, no esta contenido */
         
-        if(current->getData() == subRoot->getData()) {
-            return findSubTree(current->getLeft(), subRoot->getLeft()) && 
-                   findSubTree(current->getRight(), subRoot->getRight());
+        if(current->getData() == subRoot->getData()) { /* si coinciden los nodos raices */
+            return findSubTree(current->getLeft(), subRoot->getLeft()) /* comparar subarbol izquierdo */
+                   && findSubTree(current->getRight(), subRoot->getRight()); /* y subarbol derecho */
         }
-        return findSubTree(current->getLeft(), subRoot) || 
-               findSubTree(current->getRight(), subRoot);
+        return findSubTree(current->getLeft(), subRoot) /* buscar en subarbol izquierdo */
+               || findSubTree(current->getRight(), subRoot); /* o en subarbol derecho */
     }
 
 public:
     /* constructores */
     
     /* constructor predeterminado */
-    BinaryTree() : root(NULL), size(0) {}
+    BinaryTree() : root(NULL), size(0) {} /* inicializacion normal, promedio */
     
     /* constructor con valor inicial */
-    BinaryTree(const T& rootData) : root(new BinaryTreeNode<T>(rootData)), size(1) {}
+    BinaryTree(const T& rootData) : root(new BinaryTreeNode<T>(rootData)), size(1) {} /* inicializa con un dato */
     
     /* constructor copia */
-    BinaryTree(const BinaryTree<T>& originalBinaryTree) : root(NULL), size(0) {
-        if(!originalBinaryTree.isEmpty()) {
-            root = cloneTree(originalBinaryTree.root);
-            size = originalBinaryTree.size;
+    BinaryTree(const BinaryTree<T>& originalBinaryTree) : root(NULL), size(0) { /* inicializa predeterminado */
+        if(!originalBinaryTree.isEmpty()) { /* si el arbol del parametro tiene contenido */
+            root = cloneTree(originalBinaryTree.root); /* clona el arbol hasta la raiz */
+            size = originalBinaryTree.size; /* obtiene el elemento actual, directo */
         }
     }
 
     /* destructor */
     ~BinaryTree() {
-        clear();
+        clear(); /* limpia todos y cada uno de los nodos */
     }
 
-    /* operador de asignacion */
-    BinaryTree<T>& operator=(const BinaryTree<T>& originalBinaryTree) {
-        if(this != &originalBinaryTree) {
-            clear();
-            if(!originalBinaryTree.isEmpty()) {
-                root = cloneTree(originalBinaryTree.root);
-                size = originalBinaryTree.size;
+    /* operador de asignacion, esto es utilizado para que puedan permitirse asignaciones directas
+    entre mismos tipos de datos, de forma que miArbol = otroArbol sea directo y genere una copie real
+    y efectiva */
+    BinaryTree<T>& operator=(const BinaryTree<T>& originalBinaryTree) { 
+        if(this != &originalBinaryTree) { /* evita la auto-asignacion */
+            clear(); /* limpia el arbol actual */
+            if(!originalBinaryTree.isEmpty()) { /* si el arbol pasado por parametro tiene contenido, procede a copiar */
+                root = cloneTree(originalBinaryTree.root); /* clona */
+                size = originalBinaryTree.size; /* clona */
             }
         }
         return *this;
@@ -258,20 +219,20 @@ public:
     
     /* obtiene el dato de la raiz */
     T getRoot() const {
-        if(isEmpty()) return T();
-        return root->getData();
+        if(isEmpty()) return T(); /* si esta vacio, retorna el dato predeterminado */
+        return root->getData(); /* retorna el real */
     }
     
     /* obtiene la cantidad de nodos */
     int getSize() const {
-        return size;
+        return size; /* retorna el tama;o */
     }
 
     /* metodos de insercion */
     
     /* inserta un subarbol completo */
     void insertSubTree(const BinaryTree<T>& subTree, bool left) {
-        root = auxiliarInsertSubTree(root, subTree.root, left);
+        root = auxiliarInsertSubTree(root, subTree.root, left); 
     }
 
     /* metodos de eliminacion */
